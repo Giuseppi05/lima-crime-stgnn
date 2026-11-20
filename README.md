@@ -29,7 +29,7 @@ python -m venv .venv
 
 | Fase | Comando | Salida principal |
 | --- | --- | --- |
-| Comprensión del problema | — | `CONTEXTO_GNN.md`, `configs/ventanas.yaml` |
+| Comprensión del problema | — | `configs/ventanas.yaml` (ventanas, semillas, grillas y criterio de parada) |
 | Comprensión de los datos | `python -m src.datos` | `results/fichas/calidad.md`, `data/processed/panel.csv` |
 | Preparación de los datos | `python -m src.grafos` | `data/processed/nodos.csv`, `aristas_*.csv`, `matriz_*.csv`, `results/fichas/validacion_grafos.md` |
 | Modelado | `python -m src.baselines --pandemia` | referencias simples y XGBoost |
