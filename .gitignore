@@ -1,0 +1,10 @@
+.venv/
+data/raw/
+data/external/*
+!data/external/FUENTES.md
+results_rapido/
+__pycache__/
+*.pyc
+# notas internas del equipo: no se publican
+CONTEXTO_GNN.md
+PROMPT_INICIO.md
