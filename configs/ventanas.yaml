@@ -1,0 +1,141 @@
+semillas:
+- 0
+- 1
+- 2
+- 3
+- 4
+horizonte_meses: 1
+entrada_meses: 12
+ventanas:
+  '1':
+    entrenamiento:
+    - 2018-01
+    - 2021-09
+    validacion:
+    - 2021-10
+    - 2022-09
+    prueba:
+    - 2022-10
+    - 2023-09
+  '2':
+    entrenamiento:
+    - 2018-01
+    - 2022-09
+    validacion:
+    - 2022-10
+    - 2023-09
+    prueba:
+    - 2023-10
+    - 2024-09
+  '3':
+    entrenamiento:
+    - 2018-01
+    - 2023-09
+    validacion:
+    - 2023-10
+    - 2024-09
+    prueba:
+    - 2024-10
+    - 2025-09
+  '4':
+    entrenamiento:
+    - 2018-01
+    - 2024-09
+    validacion:
+    - 2024-10
+    - 2025-09
+    prueba:
+    - 2025-10
+    - 2026-09
+ventana_pandemia:
+  P:
+    entrenamiento:
+    - 2018-01
+    - 2019-09
+    validacion:
+    - 2019-10
+    - 2020-03
+    prueba:
+    - 2020-04
+    - 2021-03
+transformacion: log1p + estandarizacion por distrito con media y desviacion solo de
+  entrenamiento
+fijos_neuronales:
+  optimizador: Adam
+  weight_decay: 0.0001
+  perdida: Huber
+  epocas_max: 300
+  paciencia: 30
+  criterio_parada: MAE de validacion en denuncias
+  gat_heads: 2
+  tam_lote: 8
+grilla_neuronal:
+  oculto:
+  - 16
+  - 32
+  - 64
+  lr:
+  - 0.001
+  - 0.003
+  dropout:
+  - 0.1
+  - 0.3
+  entrada_meses:
+  - 6
+  - 12
+grilla_xgboost:
+  max_depth:
+  - 3
+  - 5
+  - 7
+  learning_rate:
+  - 0.03
+  - 0.1
+  subsample:
+  - 0.8
+  - 1.0
+  min_child_weight:
+  - 1
+  - 5
+fijos_xgboost:
+  n_estimators_max: 2000
+  early_stopping_rounds: 50
+  colsample_bytree: 1.0
+  reg_lambda: 1.0
+hiperparametros:
+  xgboost:
+    '1':
+      max_depth: 3
+      learning_rate: 0.1
+      subsample: 1.0
+      min_child_weight: 1
+      n_arboles: 79
+      mae_validacion: 33.7265
+    '2':
+      max_depth: 3
+      learning_rate: 0.03
+      subsample: 1.0
+      min_child_weight: 1
+      n_arboles: 330
+      mae_validacion: 75.9051
+    '3':
+      max_depth: 3
+      learning_rate: 0.1
+      subsample: 1.0
+      min_child_weight: 1
+      n_arboles: 113
+      mae_validacion: 38.7455
+    '4':
+      max_depth: 3
+      learning_rate: 0.1
+      subsample: 0.8
+      min_child_weight: 5
+      n_arboles: 14
+      mae_validacion: 28.0379
+    P:
+      max_depth: 3
+      learning_rate: 0.03
+      subsample: 0.8
+      min_child_weight: 5
+      n_arboles: 45
+      mae_validacion: 42.0405
