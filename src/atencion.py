@@ -18,7 +18,7 @@ from scipy import stats
 
 from src.comun import ATENCION, FICHAS, FIGURAS, PROCESADOS, leer_config
 from src.entrenar import cargar_entrenado, predecir_con
-from src.protocolo import cargar_datos
+from src.protocolo import H, cargar_datos
 
 FRACCION_FIDELIDAD = 0.10
 SORTEOS_AZAR = 10
@@ -90,7 +90,7 @@ def main() -> None:
         if len(a):
             t = a[a.tipo == "temporal"].copy()
             # cada corrida usa 6 o 12 meses de entrada: se promedia por separado (uniforme sería 1/6 o 1/12)
-            t["entrada"] = t.groupby(["ventana", "semilla"]).desfase.transform("max")
+            t["entrada"] = t.groupby(["ventana", "semilla"]).desfase.transform("max") - H + 1
             for L_, g in t.groupby("entrada"):
                 temp.append(g.groupby("desfase").peso.mean().rename(f"{mod} (L={L_})"))
     temp = pd.concat(temp, axis=1)

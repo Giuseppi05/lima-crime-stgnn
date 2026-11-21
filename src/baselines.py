@@ -13,28 +13,33 @@ import pandas as pd
 import xgboost as xgb
 
 from src.comun import FICHAS, PREDICCIONES, fijar_semilla, guardar_config, leer_config
-from src.protocolo import Datos, Transformacion, cargar_datos, indices, metricas, tabla_predicciones, ventanas
+from src.protocolo import COLUMNAS_MODALIDADES, H, Datos, Transformacion, cargar_datos, indices, metricas, tabla_predicciones, ventanas
 
 REZAGOS = [1, 2, 3, 6, 12]
 
 
 def referencias(d: Datos, idx: np.ndarray) -> dict[str, np.ndarray]:
-    """Solo usan meses anteriores a t."""
+    """Solo usan meses hasta t − H. Con H > 1, 'mes_anterior' es el último mes observado (t − H)."""
     return {
-        "mes_anterior": d.y[idx - 1],
+        "mes_anterior": d.y[idx - H],
         "mismo_mes_anio_anterior": d.y[idx - 12],
-        "promedio_movil_3": np.mean([d.y[idx - k] for k in (1, 2, 3)], axis=0),
+        "promedio_movil_3": np.mean([d.y[idx - H - k] for k in (0, 1, 2)], axis=0),
     }
 
 
-def rasgos(d: Datos, z: np.ndarray, idx: np.ndarray) -> pd.DataFrame:
-    """Una fila por (mes objetivo, distrito); todo rasgo sale de meses < t salvo el calendario y la pandemia."""
+def rasgos(d: Datos, z: np.ndarray, idx: np.ndarray, zx: np.ndarray | None = None) -> pd.DataFrame:
+    """Una fila por (mes objetivo, distrito); todo rasgo sale de meses ≤ t − H salvo el calendario y la pandemia."""
     n = len(d.ubigeos)
+    s = H - 1  # con H = 1 el rezago k es t − k, como en el AVC3
     filas = {}
     for k in REZAGOS:
-        filas[f"rezago_{k}"] = z[idx - k].ravel()
-    filas["media_3"] = np.mean([z[idx - k] for k in range(1, 4)], axis=0).ravel()
-    filas["media_12"] = np.mean([z[idx - k] for k in range(1, 13)], axis=0).ravel()
+        filas[f"rezago_{k}"] = z[idx - s - k].ravel()
+    filas["media_3"] = np.mean([z[idx - s - k] for k in range(1, 4)], axis=0).ravel()
+    filas["media_12"] = np.mean([z[idx - s - k] for k in range(1, 13)], axis=0).ravel()
+    if zx is not None:  # las modalidades entran igual que en la ST-GNN: último mes observado y media de 3 meses
+        for j, c in enumerate(COLUMNAS_MODALIDADES):
+            filas[f"{c}_rezago_1"] = zx[idx - s - 1, :, j].ravel()
+            filas[f"{c}_media_3"] = np.mean([zx[idx - s - k, :, j] for k in range(1, 4)], axis=0).ravel()
     mes = np.repeat(d.mes[idx], n)
     filas["mes_sin"] = np.sin(2 * np.pi * mes / 12)
     filas["mes_cos"] = np.cos(2 * np.pi * mes / 12)
@@ -48,8 +53,9 @@ def xgboost_ventana(d: Datos, v: dict, rapido: bool, semilla: int = 0):
     i_tr, i_va, i_te = (indices(d, v[k]) for k in ("entrenamiento", "validacion", "prueba"))
     tr = Transformacion(d, i_tr)
     z = tr.directa(d.y)
-    i_tr = i_tr[i_tr >= 12]  # los rezagos de 12 meses exigen un año previo
-    X_tr, X_va, X_te = (rasgos(d, z, i) for i in (i_tr, i_va, i_te))
+    zx = tr.directa_extra(d.extra) if d.extra is not None else None
+    i_tr = i_tr[i_tr >= 12 + H - 1]  # los rezagos de 12 meses exigen un año previo
+    X_tr, X_va, X_te = (rasgos(d, z, i, zx) for i in (i_tr, i_va, i_te))
     y_tr, y_va = z[i_tr].ravel(), z[i_va].ravel()
     m_tr, m_va = d.valido[i_tr].ravel(), d.valido[i_va].ravel()
 

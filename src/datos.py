@@ -77,6 +77,18 @@ def construir_panel(crudo: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     return panel, info
 
 
+def construir_modalidades(crudo: pd.DataFrame, panel: pd.DataFrame) -> pd.DataFrame:
+    """Opción extra (fuera del AVC3): hurto, robo y la suma de las demás modalidades por distrito y mes, como entradas."""
+    lima = crudo[crudo["DPTO_HECHO_NEW"] == "LIMA METROPOLITANA"].copy()
+    lima["periodo"] = lima["ANIO"].astype(str) + "-" + lima["MES"].astype(str).str.zfill(2)
+    lima["grupo"] = lima["P_MODALIDADES"].map({"Hurto": "hurto", "Robo": "robo"}).fillna("otras")
+    agg = lima.pivot_table(index=["UBIGEO_HECHO", "periodo"], columns="grupo", values="cantidad", aggfunc="sum")
+    agg.index.names = ["ubigeo", "periodo"]
+    m = agg.reindex(pd.MultiIndex.from_frame(panel[["ubigeo", "periodo"]])).fillna(0).astype(int).reset_index()
+    assert (m.hurto + m.robo).sum() == panel.objetivo.sum(), "hurto + robo no coincide con el objetivo del panel"
+    return m[["ubigeo", "periodo", "hurto", "robo", "otras"]]
+
+
 def verificar(panel: pd.DataFrame, info: dict) -> dict:
     est = panel["estado"].value_counts().to_dict()
     chk = {
@@ -243,9 +255,16 @@ def informe(panel, info, est, atip, figs) -> None:
 
 
 def main() -> None:
-    argparse.ArgumentParser(description=__doc__).parse_args()
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--modalidades", action="store_true", help="solo escribe data/processed/modalidades.csv (opción extra)")
+    a = ap.parse_args()
     crudo = leer_crudo()
     panel, info = construir_panel(crudo)
+    if a.modalidades:
+        m = construir_modalidades(crudo, panel)
+        m.to_csv(PROCESADOS / "modalidades.csv", index=False)
+        print(f"modalidades: {len(m)} filas; totales {m[['hurto', 'robo', 'otras']].sum().to_dict()}")
+        return
     est = verificar(panel, info)
     panel.to_csv(PROCESADOS / "panel.csv", index=False)
     figs = graficos(panel)

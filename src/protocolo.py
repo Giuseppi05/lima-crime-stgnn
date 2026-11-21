@@ -6,9 +6,15 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
-from src.comun import leer_config, leer_panel
+from src.comun import PROCESADOS, leer_config, leer_panel
+
+COLUMNAS_MODALIDADES = ["hurto", "robo", "otras"]
 
 STD_MIN = 1e-3  # evita dividir por ~0 en distritos casi constantes
+_CFG = leer_config()
+# meses entre el último mes observado y el mes predicho (1 en el AVC3); con H = 3 se predice t con datos hasta t − 3
+H = int(_CFG.get("horizonte_meses", 1))
+MODALIDADES_ENTRADA = bool(_CFG.get("entradas_modalidades", False))
 
 
 @dataclass
@@ -21,6 +27,7 @@ class Datos:
     valido: np.ndarray       # False en las celdas sin_informacion: no entran a métricas ni a la pérdida
     pandemia: np.ndarray     # [meses]
     mes: np.ndarray          # 1..12
+    extra: np.ndarray | None = None  # [meses, distritos, 3]: hurto, robo y otras modalidades (solo si se usan)
 
 
 def cargar_datos() -> Datos:
@@ -31,7 +38,12 @@ def cargar_datos() -> Datos:
     val = (p.pivot(index="periodo", columns="ubigeo", values="estado").loc[per, ub.ubigeo] != "sin_informacion").to_numpy()
     pan = p.groupby("periodo")["pandemia"].first().loc[per].to_numpy(float)
     mes = np.array([int(x[5:]) for x in per])
-    return Datos(per, ub.ubigeo.tolist(), ub.distrito.tolist(), y, val, pan, mes)
+    extra = None
+    if MODALIDADES_ENTRADA:
+        m = pd.read_csv(PROCESADOS / "modalidades.csv", dtype={"ubigeo": str})
+        extra = np.stack([m.pivot(index="periodo", columns="ubigeo", values=c).loc[per, ub.ubigeo].to_numpy(float)
+                          for c in COLUMNAS_MODALIDADES], -1)
+    return Datos(per, ub.ubigeo.tolist(), ub.distrito.tolist(), y, val, pan, mes, extra)
 
 
 def ventanas(incluir_pandemia: bool = False) -> dict[str, dict]:
@@ -56,6 +68,13 @@ class Transformacion:
         z = np.where(m, z, np.nan)  # los meses sin información no cuentan para la media ni la desviación
         self.media = np.nanmean(z, axis=0)
         self.desv = np.maximum(np.nanstd(z, axis=0), STD_MIN)
+        if d.extra is not None:
+            zx = np.where(m[..., None], np.log1p(d.extra[idx_entrenamiento]), np.nan)
+            self.media_x = np.nanmean(zx, axis=0)
+            self.desv_x = np.maximum(np.nanstd(zx, axis=0), STD_MIN)
+
+    def directa_extra(self, extra: np.ndarray) -> np.ndarray:
+        return (np.log1p(extra) - self.media_x) / self.desv_x
 
     def directa(self, y: np.ndarray) -> np.ndarray:
         return (np.log1p(y) - self.media) / self.desv
