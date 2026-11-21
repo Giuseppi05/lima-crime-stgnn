@@ -139,3 +139,83 @@ hiperparametros:
       min_child_weight: 5
       n_arboles: 45
       mae_validacion: 42.0405
+  GC1:
+    '1':
+      oculto: 32
+      lr: 0.001
+      dropout: 0.3
+      entrada_meses: 6
+      mae_validacion: 25.228
+    '2':
+      oculto: 32
+      lr: 0.001
+      dropout: 0.1
+      entrada_meses: 12
+      mae_validacion: 33.0749
+    '3':
+      oculto: 64
+      lr: 0.003
+      dropout: 0.3
+      entrada_meses: 12
+      mae_validacion: 36.6141
+    '4':
+      oculto: 64
+      lr: 0.003
+      dropout: 0.1
+      entrada_meses: 12
+      mae_validacion: 25.3273
+  GC2:
+    '1':
+      oculto: 16
+      lr: 0.001
+      dropout: 0.3
+      entrada_meses: 6
+      mae_validacion: 25.4486
+    '2':
+      oculto: 32
+      lr: 0.003
+      dropout: 0.3
+      entrada_meses: 12
+      mae_validacion: 33.2043
+    '3':
+      oculto: 64
+      lr: 0.003
+      dropout: 0.1
+      entrada_meses: 6
+      mae_validacion: 37.1172
+    '4':
+      oculto: 64
+      lr: 0.003
+      dropout: 0.1
+      entrada_meses: 12
+      mae_validacion: 26.0402
+  GE:
+    '1':
+      oculto: 16
+      lr: 0.001
+      dropout: 0.3
+      entrada_meses: 6
+      mae_validacion: 25.4576
+    '2':
+      oculto: 32
+      lr: 0.003
+      dropout: 0.3
+      entrada_meses: 12
+      mae_validacion: 33.1799
+    '3':
+      oculto: 64
+      lr: 0.003
+      dropout: 0.1
+      entrada_meses: 6
+      mae_validacion: 37.074
+    '4':
+      oculto: 64
+      lr: 0.003
+      dropout: 0.1
+      entrada_meses: 12
+      mae_validacion: 26.0206
+salida_neuronal:
+  elegida: residual
+  mae_validacion_promedio:
+    directa: 44.1146
+    residual: 30.3156
