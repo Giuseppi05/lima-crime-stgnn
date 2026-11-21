@@ -52,3 +52,10 @@ Generado por `python -m src.comparar_experimentos`. Todos parten de la v2 (sin p
 | ('h3_modalidades', 'GE_ens vs GC1_ens')      |  49.5763 |     49.2914 | 0.8624 |                   21 | no          |
 | ('h3_modalidades', 'GE_ens vs GC2_ens')      |  49.5763 |     48.897  | 0      |                   10 | no          |
 | ('h3_modalidades', 'GE_ens vs mes_anterior') |  49.5763 |     45.6625 | 0      |                    8 | no          |
+
+## Lectura
+
+- En validación los tres modelos neuronales quedan por debajo de la persistencia en los cuatro experimentos. En prueba ninguno la supera. La validación es optimista porque en ella se eligió la configuración y se hizo la parada temprana: esa ventaja no se sostiene fuera de muestra.
+- Las modalidades como entradas no mejoran ni en validación ni en prueba.
+- Con H = 3 el GE supera al GC₁ en prueba (p < 0,001), pero en validación el GC₁ es el mejor de los tres. La ventaja del grafo a 3 meses depende del periodo, no es estable. GE y GC₂ no se distinguen (p = 0,90).
+- El promedio de semillas baja el MAE de prueba entre 0,2 y 0,9 en todos los experimentos y no cambia ninguna conclusión.

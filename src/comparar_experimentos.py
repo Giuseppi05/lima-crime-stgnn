@@ -51,7 +51,16 @@ def main() -> None:
           t[["horizonte", "modalidades", "val_GE", "val_GC2", "val_GC1", "val_persistencia"]].round(3).to_markdown(), "",
           "## Prueba (solo se informa)\n",
           t[[c for c in t if c.startswith("prueba_")]].round(3).to_markdown(), "",
-          "## Pruebas estadísticas (n = 43 distritos)\n", pr.round(4).to_markdown(), ""]
+          "## Pruebas estadísticas (n = 43 distritos)\n", pr.round(4).to_markdown(), "",
+          "## Lectura\n",
+          "- En validación los tres modelos neuronales quedan por debajo de la persistencia en los cuatro experimentos. En "
+          "prueba ninguno la supera. La validación es optimista porque en ella se eligió la configuración y se hizo la "
+          "parada temprana: esa ventaja no se sostiene fuera de muestra.",
+          "- Las modalidades como entradas no mejoran ni en validación ni en prueba.",
+          "- Con H = 3 el GE supera al GC₁ en prueba (p < 0,001), pero en validación el GC₁ es el mejor de los tres. La "
+          "ventaja del grafo a 3 meses depende del periodo, no es estable. GE y GC₂ no se distinguen (p = 0,90).",
+          "- El promedio de semillas baja el MAE de prueba entre 0,2 y 0,9 en todos los experimentos y no cambia ninguna "
+          "conclusión.\n"]
     (EXP / "comparacion.md").write_text("\n".join(md), encoding="utf-8")
     t.to_csv(EXP / "comparacion.csv")
     print(t.round(3).T.to_string())
