@@ -4,13 +4,13 @@ Generado por `python -m src.adversos`. GE ya entrenado (4 ventanas × 5 semillas
 
 |                                        |    MAE |   MAE_sd |   RMSE |    R2 |   cambio_MAE_pct |   corridas_peor |   n |
 |:---------------------------------------|-------:|---------:|-------:|------:|-----------------:|----------------:|----:|
-| ('limpio', '-')                        | 33.406 |    5.731 | 54.424 | 0.955 |            0     |               0 |  20 |
-| ('aristas eliminadas', '10 %')         | 33.402 |    5.62  | 54.437 | 0.955 |           -0.012 |              55 | 100 |
-| ('aristas eliminadas', '20 %')         | 33.378 |    5.61  | 54.416 | 0.955 |           -0.081 |              47 | 100 |
-| ('aristas eliminadas', '30 %')         | 33.377 |    5.623 | 54.384 | 0.955 |           -0.093 |              39 | 100 |
-| ('ruido en coordenadas', 'σ = 500 m')  | 33.406 |    5.614 | 54.424 | 0.955 |           -0     |              40 | 100 |
-| ('ruido en coordenadas', 'σ = 1000 m') | 33.406 |    5.614 | 54.424 | 0.955 |            0     |              48 | 100 |
-| ('meses faltantes', '10 %')            | 34.326 |    5.912 | 56.515 | 0.951 |            2.687 |              95 | 100 |
+| ('limpio', '-')                        | 33.461 |    5.65  | 54.487 | 0.954 |            0     |               0 |  20 |
+| ('aristas eliminadas', '10 %')         | 33.457 |    5.542 | 54.498 | 0.954 |           -0.015 |              52 | 100 |
+| ('aristas eliminadas', '20 %')         | 33.434 |    5.53  | 54.466 | 0.955 |           -0.079 |              50 | 100 |
+| ('aristas eliminadas', '30 %')         | 33.433 |    5.544 | 54.448 | 0.955 |           -0.091 |              45 | 100 |
+| ('ruido en coordenadas', 'σ = 500 m')  | 33.461 |    5.535 | 54.487 | 0.954 |           -0     |              40 | 100 |
+| ('ruido en coordenadas', 'σ = 1000 m') | 33.461 |    5.535 | 54.487 | 0.954 |            0     |              47 | 100 |
+| ('meses faltantes', '10 %')            | 34.377 |    5.839 | 56.569 | 0.951 |            2.667 |              94 | 100 |
 
 `cambio_MAE_pct`: cambio porcentual medio del MAE frente al mismo modelo con datos limpios. `corridas_peor`: casos en que el MAE subió.
 

@@ -1,0 +1,95 @@
+== baselines 19:37
+ventana P: xgboost {'max_depth': 3, 'learning_rate': 0.03, 'subsample': 0.8, 'min_child_weight': 5, 'n_arboles': 45, 'mae_validacion': 42.0405}
+                 modelo ventana     MAE    RMSE     R2
+           mes_anterior       1  33.436  56.078  0.964
+mismo_mes_anio_anterior       1 115.180 175.978  0.646
+       promedio_movil_3       1  37.440  61.082  0.957
+                xgboost       1  85.304 136.626  0.787
+           mes_anterior       2  38.977  63.471  0.958
+mismo_mes_anio_anterior       2  76.866 124.697  0.840
+       promedio_movil_3       2  40.926  64.585  0.957
+                xgboost       2  76.455 124.921  0.839
+           mes_anterior       3  27.215  44.290  0.960
+mismo_mes_anio_anterior       3 108.126 160.293  0.475
+       promedio_movil_3       3  31.973  55.486  0.937
+                xgboost       3  35.914  64.412  0.915
+           mes_anterior       4  25.432  39.712  0.962
+mismo_mes_anio_anterior       4  46.905  80.591  0.845
+       promedio_movil_3       4  25.829  41.665  0.959
+                xgboost       4  30.380  56.530  0.924
+           mes_anterior       P  29.208  52.905  0.794
+mismo_mes_anio_anterior       P 108.559 169.552 -1.114
+       promedio_movil_3       P  36.922  77.213  0.562
+                xgboost       P 105.800 160.323 -0.890
+== ajuste 19:38
+ajuste: 576 entrenamientos pendientes, 14 procesos
+  200/576  último: {'ventana': '2', 'modelo': 'GC1', 'salida': 'directa', 'oculto': 16, 'lr': 0.0003, 'dropout': 0.3, 'entrada_meses': 12, 'mae_validacion': 108.1884, 'epocas': 31, 'segundos': 8.3}
+  400/576  último: {'ventana': '3', 'modelo': 'GC2', 'salida': 'directa', 'oculto': 32, 'lr': 0.0003, 'dropout': 0.3, 'entrada_meses': 12, 'mae_validacion': 53.1261, 'epocas': 158, 'segundos': 371.0}
+salida          directa  residual
+modelo ventana                   
+GC1    1         29.749    25.228
+       2         49.439    32.965
+       3         36.097    36.614
+       4         29.197    25.327
+GC2    1         34.893    25.449
+       2         64.039    33.204
+       3         50.448    37.117
+       4         43.818    25.918
+GE     1         34.863    25.458
+       2         64.025    33.180
+       3         50.436    37.074
+       4         42.372    25.917 
+salida elegida: residual
+== final 21:08
+                   MAE    RMSE     R2
+modelo ventana                       
+GC1    1        38.204  62.825  0.955
+       2        39.162  63.610  0.958
+       3        27.826  46.621  0.955
+       4        25.661  41.225  0.959
+GC2    1        37.314  61.457  0.957
+       2        38.671  62.902  0.959
+       3        31.318  51.161  0.946
+       4        25.589  40.084  0.962
+GE     1        37.229  61.363  0.957
+       2        38.681  62.893  0.959
+       3        32.343  53.586  0.940
+       4        25.593  40.107  0.962
+== pandemia 21:15
+ajuste: 144 entrenamientos pendientes, 14 procesos
+salida elegida: residual
+                   MAE    RMSE     R2
+modelo ventana                       
+GC1    P        32.153  57.639  0.755
+GC2    P        29.193  52.661  0.796
+GE     P        29.223  52.690  0.796
+== evaluacion 21:19
+                                    MAE            RMSE             R2           MASE
+modelo                                                                               
+GE                       33.469 ± 1.368  55.335 ± 2.559  0.957 ± 0.004  1.067 ± 0.044
+GC2                       33.23 ± 0.963  54.737 ± 1.617  0.958 ± 0.003  1.059 ± 0.031
+GC1                       32.72 ± 0.403  54.489 ± 0.696  0.958 ± 0.001  1.043 ± 0.013
+xgboost                    57.039 ± 0.0   102.035 ± 0.0    0.854 ± 0.0    1.819 ± 0.0
+mes_anterior               31.271 ± 0.0     51.76 ± 0.0    0.962 ± 0.0    0.997 ± 0.0
+promedio_movil_3            34.05 ± 0.0    56.397 ± 0.0    0.955 ± 0.0    1.086 ± 0.0
+mismo_mes_anio_anterior    86.808 ± 0.0   140.319 ± 0.0    0.723 ± 0.0    2.766 ± 0.0
+       comparacion   prueba            p GE_supera
+         GE vs GC1 Wilcoxon 2.104510e-02        no
+         GE vs GC2 Wilcoxon 8.959349e-03        no
+     GE vs xgboost Wilcoxon 1.906214e-06        sí
+GE vs mes_anterior Wilcoxon 1.158196e-08        no
+   GC2 peso_x_grado  n_tramos -0.016 0.874         98          
+   GC2 peso_x_grado limite_km -0.052 0.609         98          
+{'dMAE_top': -0.047, 'dMAE_azar': 0.013}
+ventana 4 semilla 4 listo
+                                    MAE  MAE_sd    RMSE     R2  cambio_MAE_pct  corridas_peor    n
+caso                 nivel                                                                        
+limpio               -           33.461   5.650  54.487  0.954           0.000              0   20
+aristas eliminadas   10 %        33.457   5.542  54.498  0.954          -0.015             52  100
+                     20 %        33.434   5.530  54.466  0.955          -0.079             50  100
+                     30 %        33.433   5.544  54.448  0.955          -0.091             45  100
+ruido en coordenadas σ = 500 m   33.461   5.535  54.487  0.954          -0.000             40  100
+                     σ = 1000 m  33.461   5.535  54.487  0.954           0.000             47  100
+meses faltantes      10 %        34.377   5.839  56.569  0.951           2.667             94  100
+mapa 2026-09: 43 distritos
+== FIN 21:26

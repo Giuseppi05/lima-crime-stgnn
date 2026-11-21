@@ -75,6 +75,8 @@ grilla_neuronal:
   - 32
   - 64
   lr:
+  - 0.0001
+  - 0.0003
   - 0.001
   - 0.003
   dropout:
@@ -85,10 +87,12 @@ grilla_neuronal:
   - 12
 grilla_xgboost:
   max_depth:
+  - 2
   - 3
   - 5
   - 7
   learning_rate:
+  - 0.01
   - 0.03
   - 0.1
   subsample:
@@ -105,33 +109,33 @@ fijos_xgboost:
 hiperparametros:
   xgboost:
     '1':
-      max_depth: 3
+      max_depth: 2
       learning_rate: 0.1
       subsample: 1.0
-      min_child_weight: 1
-      n_arboles: 79
-      mae_validacion: 33.7265
+      min_child_weight: 5
+      n_arboles: 64
+      mae_validacion: 33.0231
     '2':
-      max_depth: 3
+      max_depth: 2
       learning_rate: 0.03
       subsample: 1.0
       min_child_weight: 1
-      n_arboles: 330
-      mae_validacion: 75.9051
+      n_arboles: 663
+      mae_validacion: 70.5822
     '3':
-      max_depth: 3
-      learning_rate: 0.1
-      subsample: 1.0
-      min_child_weight: 1
-      n_arboles: 113
-      mae_validacion: 38.7455
-    '4':
-      max_depth: 3
+      max_depth: 2
       learning_rate: 0.1
       subsample: 0.8
       min_child_weight: 5
-      n_arboles: 14
-      mae_validacion: 28.0379
+      n_arboles: 163
+      mae_validacion: 37.8688
+    '4':
+      max_depth: 2
+      learning_rate: 0.03
+      subsample: 0.8
+      min_child_weight: 1
+      n_arboles: 61
+      mae_validacion: 27.2106
     P:
       max_depth: 3
       learning_rate: 0.03
@@ -148,10 +152,10 @@ hiperparametros:
       mae_validacion: 25.228
     '2':
       oculto: 32
-      lr: 0.001
+      lr: 0.0003
       dropout: 0.1
       entrada_meses: 12
-      mae_validacion: 33.0749
+      mae_validacion: 32.9646
     '3':
       oculto: 64
       lr: 0.003
@@ -191,10 +195,10 @@ hiperparametros:
       mae_validacion: 37.1172
     '4':
       oculto: 64
-      lr: 0.003
-      dropout: 0.1
+      lr: 0.0001
+      dropout: 0.3
       entrada_meses: 12
-      mae_validacion: 26.0402
+      mae_validacion: 25.9182
     P:
       oculto: 16
       lr: 0.003
@@ -222,10 +226,10 @@ hiperparametros:
       mae_validacion: 37.074
     '4':
       oculto: 64
-      lr: 0.003
-      dropout: 0.1
+      lr: 0.0001
+      dropout: 0.3
       entrada_meses: 12
-      mae_validacion: 26.0206
+      mae_validacion: 25.9172
     P:
       oculto: 16
       lr: 0.003
@@ -236,4 +240,10 @@ salida_neuronal:
   elegida: residual
   mae_validacion_promedio:
     directa: 44.1146
-    residual: 30.3156
+    residual: 30.2876
+version:
+  actual: v2
+  v1: grilla de partida (lr 1e-3 y 3e-3; XGBoost 24 combinaciones), tag git v1-resultados
+  v2: 'grilla ampliada solo con lr 1e-4 y 3e-4 (48 combinaciones) y XGBoost a 48;
+    motivo: en v1 el mejor MAE de validacion llego en las epocas 1-4 (mediana 4 con
+    salida residual). Eleccion solo con validacion.'
