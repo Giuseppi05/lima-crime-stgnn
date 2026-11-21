@@ -1,0 +1,81 @@
+== ajuste 21:51
+ajuste: 1152 entrenamientos pendientes, 15 procesos
+  100/1152  último: {'ventana': '1', 'modelo': 'GC1', 'salida': 'directa', 'oculto': 16, 'lr': 0.0001, 'dropout': 0.3, 'entrada_meses': 12, 'mae_validacion': 35.0762, 'epocas': 63, 'segundos': 12.9}
+  200/1152  último: {'ventana': '1', 'modelo': 'GC2', 'salida': 'directa', 'oculto': 16, 'lr': 0.0003, 'dropout': 0.3, 'entrada_meses': 12, 'mae_validacion': 39.2526, 'epocas': 31, 'segundos': 16.5}
+  300/1152  último: {'ventana': '2', 'modelo': 'GE', 'salida': 'directa', 'oculto': 16, 'lr': 0.001, 'dropout': 0.3, 'entrada_meses': 12, 'mae_validacion': 80.0905, 'epocas': 258, 'segundos': 185.2}
+  400/1152  último: {'ventana': '2', 'modelo': 'GC1', 'salida': 'directa', 'oculto': 16, 'lr': 0.003, 'dropout': 0.3, 'entrada_meses': 12, 'mae_validacion': 58.9592, 'epocas': 147, 'segundos': 30.0}
+  500/1152  último: {'ventana': '2', 'modelo': 'GC2', 'salida': 'directa', 'oculto': 32, 'lr': 0.0001, 'dropout': 0.3, 'entrada_meses': 12, 'mae_validacion': 100.3544, 'epocas': 300, 'segundos': 502.1}
+  600/1152  último: {'ventana': '3', 'modelo': 'GE', 'salida': 'directa', 'oculto': 32, 'lr': 0.0003, 'dropout': 0.3, 'entrada_meses': 12, 'mae_validacion': 52.24, 'epocas': 135, 'segundos': 261.4}
+  700/1152  último: {'ventana': '3', 'modelo': 'GC1', 'salida': 'directa', 'oculto': 32, 'lr': 0.001, 'dropout': 0.3, 'entrada_meses': 12, 'mae_validacion': 39.7695, 'epocas': 71, 'segundos': 33.2}
+  800/1152  último: {'ventana': '3', 'modelo': 'GC2', 'salida': 'directa', 'oculto': 32, 'lr': 0.003, 'dropout': 0.3, 'entrada_meses': 12, 'mae_validacion': 54.0031, 'epocas': 102, 'segundos': 209.5}
+  900/1152  último: {'ventana': '4', 'modelo': 'GE', 'salida': 'directa', 'oculto': 64, 'lr': 0.0001, 'dropout': 0.3, 'entrada_meses': 12, 'mae_validacion': 45.8502, 'epocas': 44, 'segundos': 217.7}
+  1000/1152  último: {'ventana': '4', 'modelo': 'GC1', 'salida': 'directa', 'oculto': 64, 'lr': 0.0003, 'dropout': 0.3, 'entrada_meses': 12, 'mae_validacion': 42.1739, 'epocas': 33, 'segundos': 34.8}
+  1100/1152  último: {'ventana': '4', 'modelo': 'GC2', 'salida': 'directa', 'oculto': 64, 'lr': 0.001, 'dropout': 0.3, 'entrada_meses': 12, 'mae_validacion': 46.8806, 'epocas': 31, 'segundos': 162.6}
+salida          directa  residual
+modelo ventana                   
+GC1    1         27.399    24.503
+       2         47.701    32.976
+       3         36.794    35.680
+       4         28.415    25.335
+GC2    1         35.492    25.467
+       2         64.460    33.114
+       3         50.023    38.341
+       4         41.533    25.910
+GE     1         35.204    25.477
+       2         63.793    33.095
+       3         50.092    38.338
+       4         41.637    25.910 
+salida elegida: residual
+== final 23:47
+                   MAE    RMSE     R2
+modelo ventana                       
+GC1    1        45.614  73.974  0.937
+       2        39.537  64.196  0.957
+       3        29.547  49.301  0.950
+       4        25.747  41.301  0.959
+GC2    1        37.146  61.491  0.957
+       2        38.760  63.037  0.959
+       3        27.236  44.132  0.960
+       4        25.603  40.123  0.962
+GE     1        37.110  61.483  0.957
+       2        38.750  62.998  0.959
+       3        27.245  44.186  0.960
+       4        25.611  40.150  0.962
+== pandemia 23:55
+ajuste: 288 entrenamientos pendientes, 15 procesos
+salida elegida: residual
+                   MAE    RMSE     R2
+modelo ventana                       
+GC1    P        30.917  56.414  0.765
+GC2    P        29.086  52.777  0.795
+GE     P        29.360  53.145  0.792
+== evaluacion 00:05
+                                    MAE            RMSE             R2           MASE
+modelo                                                                               
+GE                       32.186 ± 0.319  53.195 ± 0.532   0.96 ± 0.001   1.026 ± 0.01
+GC2                      32.193 ± 0.337  53.193 ± 0.556   0.96 ± 0.001  1.026 ± 0.011
+GC1                        35.12 ± 1.18  58.703 ± 2.316  0.951 ± 0.004  1.118 ± 0.037
+xgboost                    57.039 ± 0.0   102.035 ± 0.0    0.854 ± 0.0    1.819 ± 0.0
+mes_anterior               31.271 ± 0.0     51.76 ± 0.0    0.962 ± 0.0    0.997 ± 0.0
+promedio_movil_3            34.05 ± 0.0    56.397 ± 0.0    0.955 ± 0.0    1.086 ± 0.0
+mismo_mes_anio_anterior    86.808 ± 0.0   140.319 ± 0.0    0.723 ± 0.0    2.766 ± 0.0
+       comparacion   prueba            p GE_supera
+         GE vs GC1 Wilcoxon 2.830564e-06        sí
+         GE vs GC2 Wilcoxon 3.982257e-02        no
+     GE vs xgboost Wilcoxon 4.529666e-07        sí
+GE vs mes_anterior Wilcoxon 1.495210e-06        no
+   GC2 peso_x_grado  n_tramos  0.029 0.780         98          
+   GC2 peso_x_grado limite_km -0.019 0.851         98          
+{'dMAE_top': -0.019, 'dMAE_azar': 0.001}
+ventana 4 semilla 4 listo
+                                    MAE  MAE_sd    RMSE     R2  cambio_MAE_pct  corridas_peor    n
+caso                 nivel                                                                        
+limpio               -           32.179   5.983  52.204  0.959           0.000              0   20
+aristas eliminadas   10 %        32.178   5.869  52.215  0.959          -0.008             46  100
+                     20 %        32.191   5.878  52.218  0.959           0.027             56  100
+                     30 %        32.185   5.881  52.186  0.959           0.006             43  100
+ruido en coordenadas σ = 500 m   32.179   5.860  52.204  0.959          -0.000             39  100
+                     σ = 1000 m  32.179   5.861  52.204  0.959           0.000             49  100
+meses faltantes      10 %        33.131   6.113  54.044  0.956           2.930             95  100
+mapa 2026-09: 43 distritos
+== FIN 00:12

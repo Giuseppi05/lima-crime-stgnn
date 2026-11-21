@@ -69,6 +69,7 @@ fijos_neuronales:
   criterio_parada: MAE de validacion en denuncias
   gat_heads: 2
   tam_lote: 8
+  ponderar_perdida: true
 grilla_neuronal:
   oculto:
   - 16
@@ -145,105 +146,108 @@ hiperparametros:
       mae_validacion: 42.0405
   GC1:
     '1':
-      oculto: 32
-      lr: 0.001
-      dropout: 0.3
-      entrada_meses: 6
-      mae_validacion: 25.228
-    '2':
-      oculto: 32
-      lr: 0.0003
-      dropout: 0.1
-      entrada_meses: 12
-      mae_validacion: 32.9646
-    '3':
       oculto: 64
       lr: 0.003
       dropout: 0.3
+      entrada_meses: 6
+      mae_validacion: 24.5029
+    '2':
+      oculto: 64
+      lr: 0.0001
+      dropout: 0.3
       entrada_meses: 12
-      mae_validacion: 36.6141
+      mae_validacion: 32.9755
+    '3':
+      oculto: 64
+      lr: 0.003
+      dropout: 0.1
+      entrada_meses: 6
+      mae_validacion: 35.6803
     '4':
       oculto: 64
       lr: 0.003
       dropout: 0.1
       entrada_meses: 12
-      mae_validacion: 25.3273
+      mae_validacion: 25.335
     P:
-      oculto: 64
-      lr: 0.003
+      oculto: 32
+      lr: 0.001
       dropout: 0.1
       entrada_meses: 6
-      mae_validacion: 37.5448
+      mae_validacion: 37.281
   GC2:
     '1':
       oculto: 16
-      lr: 0.001
+      lr: 0.0001
       dropout: 0.3
       entrada_meses: 6
-      mae_validacion: 25.4486
+      mae_validacion: 25.4673
     '2':
       oculto: 32
       lr: 0.003
       dropout: 0.3
       entrada_meses: 12
-      mae_validacion: 33.2043
+      mae_validacion: 33.1145
     '3':
       oculto: 64
       lr: 0.003
       dropout: 0.1
-      entrada_meses: 6
-      mae_validacion: 37.1172
+      entrada_meses: 12
+      mae_validacion: 38.3412
     '4':
       oculto: 64
       lr: 0.0001
-      dropout: 0.3
+      dropout: 0.1
       entrada_meses: 12
-      mae_validacion: 25.9182
+      mae_validacion: 25.9105
     P:
       oculto: 16
       lr: 0.003
       dropout: 0.1
       entrada_meses: 6
-      mae_validacion: 37.9944
+      mae_validacion: 37.8115
   GE:
     '1':
       oculto: 16
-      lr: 0.001
+      lr: 0.0001
       dropout: 0.3
       entrada_meses: 6
-      mae_validacion: 25.4576
+      mae_validacion: 25.4773
     '2':
       oculto: 32
       lr: 0.003
       dropout: 0.3
       entrada_meses: 12
-      mae_validacion: 33.1799
+      mae_validacion: 33.0946
     '3':
       oculto: 64
       lr: 0.003
       dropout: 0.1
-      entrada_meses: 6
-      mae_validacion: 37.074
+      entrada_meses: 12
+      mae_validacion: 38.3377
     '4':
       oculto: 64
       lr: 0.0001
-      dropout: 0.3
+      dropout: 0.1
       entrada_meses: 12
-      mae_validacion: 25.9172
+      mae_validacion: 25.9105
     P:
       oculto: 16
       lr: 0.003
       dropout: 0.1
       entrada_meses: 6
-      mae_validacion: 37.9925
+      mae_validacion: 37.8214
 salida_neuronal:
   elegida: residual
   mae_validacion_promedio:
-    directa: 44.1146
-    residual: 30.2876
+    directa: 43.5453
+    residual: 30.3456
 version:
-  actual: v2
+  actual: v3
   v1: grilla de partida (lr 1e-3 y 3e-3; XGBoost 24 combinaciones), tag git v1-resultados
   v2: 'grilla ampliada solo con lr 1e-4 y 3e-4 (48 combinaciones) y XGBoost a 48;
     motivo: en v1 el mejor MAE de validacion llego en las epocas 1-4 (mediana 4 con
     salida residual). Eleccion solo con validacion.'
+  v3: grilla de v2 y perdida Huber ponderada por distrito (nivel medio de entrenamiento
+    x desviacion del log), para alinear el entrenamiento con el MAE en denuncias;
+    misma ponderacion para GE, GC1 y GC2; eleccion solo con validacion.

@@ -9,7 +9,7 @@ Artefacto de investigación: **no está pensado para decisiones operativas de pa
 | Rama | Contenido |
 | --- | --- |
 | `main` | Versión estable v2: las seis fases de CRISP-DM con resultados completos (grilla ampliada, configuración elegida solo con validación). Resultados de la v1 en `results/v1/`. |
-| `dev` | Desarrollo sobre la v2: diagnóstico de dependencia espacial y versión 3 (pérdida ponderada por volumen). |
+| `dev` | Desarrollo sobre la v2: diagnóstico de dependencia espacial y versión 3 (pérdida ponderada por volumen). Resultados de la v3 en `results/fichas/` y `results/v3/`; comparación en `results/fichas/comparacion_v1_v2_v3.md`. |
 
 ## Entorno
 

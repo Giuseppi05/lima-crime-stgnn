@@ -199,11 +199,19 @@ def fase_congelar(vs):
             "entrada_meses": int(r.entrada_meses), "mae_validacion": float(r.mae_validacion)}
     guardar_config(cfg)
     t = mejor.pivot_table(index=["modelo", "ventana"], columns="salida", values="mae_validacion")
-    (FICHAS / "eleccion_salida.md").write_text(
+    # la ventana P va en su propio archivo: antes sobrescribía la tabla de las ventanas 1–4, que es la que decide
+    if "P" in vs:
+        archivo = "eleccion_salida_pandemia.md"
+        cierre = (f"\n\nPromedio por salida en P: {por_salida.round(3).to_dict()}. No decide: **se hereda {salida}**, "
+                  "elegida con las ventanas 1–4 (`eleccion_salida.md`).\n")
+    else:
+        archivo = "eleccion_salida.md"
+        cierre = (f"\n\nPromedio por salida: {por_salida.round(3).to_dict()}. **Elegida: {salida}**, "
+                  "aplicada igual a GE, GC₁ y GC₂.\n")
+    (FICHAS / archivo).write_text(
         "# Modelado: elección de la salida de los modelos neuronales\n\n"
         "Criterio: menor MAE de validación promedio (mejor configuración de la grilla por modelo y ventana, semilla 0). "
-        "El conjunto de prueba no intervino.\n\n" + t.round(3).to_markdown() +
-        f"\n\nPromedio por salida: {por_salida.round(3).to_dict()}. **Elegida: {salida}**, aplicada igual a GE, GC₁ y GC₂.\n"
+        "El conjunto de prueba no intervino.\n\n" + t.round(3).to_markdown() + cierre +
         "\nNota. Elaboración propia.\n", encoding="utf-8")
     print(t.round(3).to_string(), f"\nsalida elegida: {salida}")
 
