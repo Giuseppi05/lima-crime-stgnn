@@ -112,3 +112,113 @@ version:
     modalidades como entradas; eleccion solo con validacion'
 entradas_modalidades: true
 ensamble_semillas: true
+hiperparametros:
+  xgboost:
+    '1':
+      learning_rate: 0.03
+      max_depth: 7
+      min_child_weight: 1
+      subsample: 0.8
+      n_arboles: 14
+      mae_validacion: 38.6976
+    '2':
+      learning_rate: 0.1
+      max_depth: 3
+      min_child_weight: 1
+      subsample: 1.0
+      n_arboles: 141
+      mae_validacion: 94.0154
+    '3':
+      learning_rate: 0.03
+      max_depth: 2
+      min_child_weight: 5
+      subsample: 0.8
+      n_arboles: 244
+      mae_validacion: 51.9848
+    '4':
+      learning_rate: 0.01
+      max_depth: 7
+      min_child_weight: 1
+      subsample: 1.0
+      n_arboles: 53
+      mae_validacion: 38.9242
+  GC1:
+    '1':
+      oculto: 16
+      lr: 0.003
+      dropout: 0.1
+      entrada_meses: 6
+      mae_validacion: 33.1621
+    '2':
+      oculto: 64
+      lr: 0.0001
+      dropout: 0.1
+      entrada_meses: 6
+      mae_validacion: 47.8221
+    '3':
+      oculto: 64
+      lr: 0.003
+      dropout: 0.1
+      entrada_meses: 6
+      mae_validacion: 46.3296
+    '4':
+      oculto: 64
+      lr: 0.001
+      dropout: 0.1
+      entrada_meses: 12
+      mae_validacion: 37.2074
+  GC2:
+    '1':
+      oculto: 64
+      lr: 0.0001
+      dropout: 0.3
+      entrada_meses: 6
+      mae_validacion: 33.9163
+    '2':
+      oculto: 64
+      lr: 0.0001
+      dropout: 0.3
+      entrada_meses: 12
+      mae_validacion: 48.6946
+    '3':
+      oculto: 16
+      lr: 0.003
+      dropout: 0.1
+      entrada_meses: 6
+      mae_validacion: 46.2163
+    '4':
+      oculto: 32
+      lr: 0.001
+      dropout: 0.1
+      entrada_meses: 12
+      mae_validacion: 39.0624
+  GE:
+    '1':
+      oculto: 64
+      lr: 0.0001
+      dropout: 0.3
+      entrada_meses: 6
+      mae_validacion: 33.9885
+    '2':
+      oculto: 64
+      lr: 0.0001
+      dropout: 0.3
+      entrada_meses: 12
+      mae_validacion: 48.6875
+    '3':
+      oculto: 32
+      lr: 0.003
+      dropout: 0.1
+      entrada_meses: 6
+      mae_validacion: 46.0837
+    '4':
+      oculto: 32
+      lr: 0.001
+      dropout: 0.1
+      entrada_meses: 12
+      mae_validacion: 39.0848
+salida_neuronal:
+  elegida: residual
+  mae_validacion_promedio:
+    directa: 55.4172
+    residual: 41.6879
