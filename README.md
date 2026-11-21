@@ -8,8 +8,8 @@ Artefacto de investigación: **no está pensado para decisiones operativas de pa
 
 | Rama | Contenido |
 | --- | --- |
-| `main` | Fases cerradas y validadas: Comprensión del problema, Comprensión de los datos y Preparación de los datos (panel y grafos). |
-| `dev` | Modelado, Evaluación y Despliegue en desarrollo. |
+| `main` | Versión estable v2: las seis fases de CRISP-DM con resultados completos (grilla ampliada, configuración elegida solo con validación). Resultados de la v1 en `results/v1/`. |
+| `dev` | Desarrollo sobre la v2: diagnóstico de dependencia espacial y versión 3 (pérdida ponderada por volumen). |
 
 ## Entorno
 
