@@ -1,0 +1,9 @@
+grafo,variable,periodo,I_media,meses,meses_significativos,meses_sig_positivos
+geográfico (GC₂),nivel log1p,2018-02 – 2026-09,0.6787827575068608,105,105,105
+geográfico (GC₂),nivel log1p,2022-01 – 2026-09,0.6821972504203169,57,57,57
+geográfico (GC₂),cambio mensual Δlog,2018-02 – 2026-09,0.025958687541846437,104,45,26
+geográfico (GC₂),cambio mensual Δlog,2022-01 – 2026-09,-0.010827621662877068,57,21,10
+vial (GE),nivel log1p,2018-02 – 2026-09,0.680875028750205,105,105,105
+vial (GE),nivel log1p,2022-01 – 2026-09,0.685888074808965,57,57,57
+vial (GE),cambio mensual Δlog,2018-02 – 2026-09,0.02133196529422832,104,41,23
+vial (GE),cambio mensual Δlog,2022-01 – 2026-09,-0.014305159583276921,57,20,9

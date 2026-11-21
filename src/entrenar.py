@@ -26,7 +26,9 @@ from src.protocolo import Datos, Transformacion, cargar_datos, indices, metricas
 
 MODELOS = {"GE": "vial", "GC1": None, "GC2": "geo"}
 MODELOS_DIR = RESULTADOS / "modelos"
-AJUSTE_CSV = FICHAS / "ajuste_hiperparametros.csv"
+_VERSION = leer_config().get("version", {}).get("actual", "v1")
+# cada versión del modelado tiene su propio registro de ajuste: v1 y v2 comparten el de la grilla ampliada
+AJUSTE_CSV = FICHAS / ("ajuste_hiperparametros.csv" if _VERSION in ("v1", "v2") else f"ajuste_hiperparametros_{_VERSION}.csv")
 
 
 def cargar_grafo(tipo: str | None, ubigeos: list[str], matriz: np.ndarray | None = None):
@@ -77,6 +79,12 @@ def entrenar_una(d: Datos, v: dict, nombre: str, hp: dict, residual: bool, semil
     i_fit = i_tr[i_tr >= L]
     Xtr, Ytr = ventanas_x(X, i_fit, L), X[i_fit, :, 0]
     Mtr = torch.tensor(d.valido[i_fit], dtype=torch.float32)  # los meses sin información no entran a la pérdida
+    if cfg.get("ponderar_perdida", False):
+        # el MAE se mide en denuncias: un error e en la escala estandarizada equivale a ≈ e·desv·nivel denuncias,
+        # así que cada distrito pesa en la pérdida según su nivel medio de entrenamiento por su desviación en log
+        nivel = np.nanmean(np.where(d.valido[i_tr], d.y[i_tr], np.nan), axis=0)
+        peso = nivel * tr.desv
+        Mtr = Mtr * torch.tensor(peso / peso.mean(), dtype=torch.float32).view(1, -1)
     modelo = STGNN(int(hp["oculto"]), float(hp["dropout"]), MODELOS[nombre] is not None, residual, cfg["gat_heads"])
     opt = torch.optim.Adam(modelo.parameters(), lr=float(hp["lr"]), weight_decay=cfg["weight_decay"])
     huber = torch.nn.HuberLoss(reduction="none")
