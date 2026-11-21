@@ -136,6 +136,7 @@ def main() -> None:
         filas.append({"comparacion": f"GE vs {rival}", "tipo": tipo, "MAE_GE": g_ms.loc["GE", "MAE"],
                       f"MAE_rival": g_ms.loc[rival, "MAE"], "RMSE_GE": g_ms.loc["GE", "RMSE"],
                       "RMSE_rival": g_ms.loc[rival, "RMSE"], **c, "p_RMSE_distrito": c_r["p"],
+                      "menor_MAE_por_distrito": "GE" if c["media_dif"] < 0 else rival,
                       "prueba_RMSE": c_r["prueba"], "GE_supera": "sí" if exito else "no"})
     est = pd.DataFrame(filas)
     est.to_csv(FICHAS / "pruebas_estadisticas.csv", index=False)

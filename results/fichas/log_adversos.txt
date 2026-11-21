@@ -1,0 +1,33 @@
+         cambio_abs_medio_peso  cambio_abs_max_peso
+sigma_m                                            
+500                     0.0178               0.2428
+1000                    0.0228               0.2080
+ventana 1 semilla 0 listo
+ventana 1 semilla 1 listo
+ventana 1 semilla 2 listo
+ventana 1 semilla 3 listo
+ventana 1 semilla 4 listo
+ventana 2 semilla 0 listo
+ventana 2 semilla 1 listo
+ventana 2 semilla 2 listo
+ventana 2 semilla 3 listo
+ventana 2 semilla 4 listo
+ventana 3 semilla 0 listo
+ventana 3 semilla 1 listo
+ventana 3 semilla 2 listo
+ventana 3 semilla 3 listo
+ventana 3 semilla 4 listo
+ventana 4 semilla 0 listo
+ventana 4 semilla 1 listo
+ventana 4 semilla 2 listo
+ventana 4 semilla 3 listo
+ventana 4 semilla 4 listo
+                                    MAE  MAE_sd    RMSE     R2  cambio_MAE_pct  corridas_peor    n
+caso                 nivel                                                                        
+limpio               -           33.406   5.731  54.424  0.955           0.000              0   20
+aristas eliminadas   10 %        33.402   5.620  54.437  0.955          -0.012             55  100
+                     20 %        33.378   5.610  54.416  0.955          -0.081             47  100
+                     30 %        33.377   5.623  54.384  0.955          -0.093             39  100
+ruido en coordenadas σ = 500 m   33.406   5.614  54.424  0.955          -0.000             40  100
+                     σ = 1000 m  33.406   5.614  54.424  0.955           0.000             48  100
+meses faltantes      10 %        34.326   5.912  56.515  0.951           2.687             95  100

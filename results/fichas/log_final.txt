@@ -1,0 +1,75 @@
+final: 60 corridas, 14 procesos
+  {'modelo': 'GE', 'ventana': '1', 'semilla': 0, 'mae_validacion': 25.4576, 'epocas': 45, 'MAE': 37.796771388266436, 'RMSE': 62.393910445927155, 'R2': 0.9554762682543338}
+  {'modelo': 'GE', 'ventana': '1', 'semilla': 1, 'mae_validacion': 25.4821, 'epocas': 52, 'MAE': 38.7136395327574, 'RMSE': 63.22414667397587, 'R2': 0.9542834867414036}
+  {'modelo': 'GE', 'ventana': '1', 'semilla': 2, 'mae_validacion': 25.4637, 'epocas': 51, 'MAE': 36.963579204359164, 'RMSE': 61.07557510569234, 'R2': 0.9573378953004041}
+  {'modelo': 'GE', 'ventana': '1', 'semilla': 3, 'mae_validacion': 25.4706, 'epocas': 44, 'MAE': 36.40225343734387, 'RMSE': 60.17488109111747, 'R2': 0.9585869107344678}
+  {'modelo': 'GE', 'ventana': '1', 'semilla': 4, 'mae_validacion': 25.4661, 'epocas': 41, 'MAE': 36.267459921289465, 'RMSE': 59.948824741990656, 'R2': 0.9588974757830924}
+  {'modelo': 'GC1', 'ventana': '1', 'semilla': 0, 'mae_validacion': 25.228, 'epocas': 38, 'MAE': 38.21125288573683, 'RMSE': 62.82449134661697, 'R2': 0.954859630565426}
+  {'modelo': 'GC1', 'ventana': '1', 'semilla': 1, 'mae_validacion': 25.3095, 'epocas': 32, 'MAE': 38.97363269724695, 'RMSE': 63.14764468969268, 'R2': 0.9543940548775368}
+  {'modelo': 'GC1', 'ventana': '1', 'semilla': 2, 'mae_validacion': 25.3298, 'epocas': 35, 'MAE': 37.67976873561222, 'RMSE': 62.23956587025076, 'R2': 0.955696273596653}
+  {'modelo': 'GC1', 'ventana': '1', 'semilla': 3, 'mae_validacion': 25.2431, 'epocas': 36, 'MAE': 38.548738963943116, 'RMSE': 63.57495904042318, 'R2': 0.9537747439930915}
+  {'modelo': 'GC1', 'ventana': '1', 'semilla': 4, 'mae_validacion': 25.2583, 'epocas': 35, 'MAE': 37.60544293252001, 'RMSE': 62.338932350524715, 'R2': 0.9555546974313888}
+  {'modelo': 'GC2', 'ventana': '1', 'semilla': 0, 'mae_validacion': 25.4486, 'epocas': 45, 'MAE': 37.81332519426527, 'RMSE': 62.38875591934488, 'R2': 0.955483624397824}
+  {'modelo': 'GC2', 'ventana': '1', 'semilla': 1, 'mae_validacion': 25.4773, 'epocas': 52, 'MAE': 38.74777333935075, 'RMSE': 63.232320135757966, 'R2': 0.9542716657411482}
+  {'modelo': 'GC2', 'ventana': '1', 'semilla': 2, 'mae_validacion': 25.4474, 'epocas': 52, 'MAE': 37.198151169153746, 'RMSE': 61.37768228169204, 'R2': 0.9569147996793012}
+  {'modelo': 'GC2', 'ventana': '1', 'semilla': 3, 'mae_validacion': 25.4521, 'epocas': 44, 'MAE': 36.45233471673544, 'RMSE': 60.24801240929937, 'R2': 0.9584861898323966}
+  {'modelo': 'GC2', 'ventana': '1', 'semilla': 4, 'mae_validacion': 25.4561, 'epocas': 41, 'MAE': 36.36016187776501, 'RMSE': 60.039575401293014, 'R2': 0.9587729394142753}
+  {'modelo': 'GE', 'ventana': '2', 'semilla': 0, 'mae_validacion': 33.1799, 'epocas': 31, 'MAE': 38.7367363879931, 'RMSE': 63.13425237556462, 'R2': 0.9588784638873799}
+  {'modelo': 'GE', 'ventana': '2', 'semilla': 1, 'mae_validacion': 34.1161, 'epocas': 32, 'MAE': 38.85272413822926, 'RMSE': 62.95576163085604, 'R2': 0.9591106496790319}
+  {'modelo': 'GE', 'ventana': '2', 'semilla': 2, 'mae_validacion': 33.0784, 'epocas': 31, 'MAE': 38.5754365952148, 'RMSE': 62.855618077597605, 'R2': 0.959240631365483}
+  {'modelo': 'GE', 'ventana': '2', 'semilla': 3, 'mae_validacion': 33.0819, 'epocas': 31, 'MAE': 38.589139598064115, 'RMSE': 62.892086930351105, 'R2': 0.9591933204431756}
+  {'modelo': 'GE', 'ventana': '2', 'semilla': 4, 'mae_validacion': 33.2436, 'epocas': 31, 'MAE': 38.64875307117594, 'RMSE': 62.62549865223814, 'R2': 0.9595385316386803}
+  {'modelo': 'GC1', 'ventana': '2', 'semilla': 0, 'mae_validacion': 33.0749, 'epocas': 31, 'MAE': 39.26856027436839, 'RMSE': 64.2659751586828, 'R2': 0.9573909894599248}
+  {'modelo': 'GC1', 'ventana': '2', 'semilla': 1, 'mae_validacion': 34.7775, 'epocas': 31, 'MAE': 41.60014303622793, 'RMSE': 66.34825192395442, 'R2': 0.9545851153390319}
+  {'modelo': 'GC1', 'ventana': '2', 'semilla': 2, 'mae_validacion': 32.9166, 'epocas': 31, 'MAE': 39.310448459156774, 'RMSE': 64.05056326777735, 'R2': 0.9576761513954333}
+  {'modelo': 'GC1', 'ventana': '2', 'semilla': 3, 'mae_validacion': 33.1554, 'epocas': 31, 'MAE': 38.71290141358734, 'RMSE': 63.17845583329183, 'R2': 0.9588208612279286}
+  {'modelo': 'GC1', 'ventana': '2', 'semilla': 4, 'mae_validacion': 33.2212, 'epocas': 32, 'MAE': 40.108176012855786, 'RMSE': 65.14207946330095, 'R2': 0.9562213382664744}
+  {'modelo': 'GC2', 'ventana': '2', 'semilla': 0, 'mae_validacion': 33.2043, 'epocas': 31, 'MAE': 38.73442204795885, 'RMSE': 63.14913352539724, 'R2': 0.9588590763810482}
+  {'modelo': 'GC2', 'ventana': '2', 'semilla': 1, 'mae_validacion': 34.1374, 'epocas': 32, 'MAE': 38.817678965747504, 'RMSE': 62.92697371863293, 'R2': 0.959148036245903}
+  {'modelo': 'GC2', 'ventana': '2', 'semilla': 2, 'mae_validacion': 33.1144, 'epocas': 31, 'MAE': 38.565242041380955, 'RMSE': 62.851718779902896, 'R2': 0.9592456882875928}
+  {'modelo': 'GC2', 'ventana': '2', 'semilla': 3, 'mae_validacion': 33.1191, 'epocas': 31, 'MAE': 38.58980786231221, 'RMSE': 62.92425046728167, 'R2': 0.95915157201925}
+  {'modelo': 'GC2', 'ventana': '2', 'semilla': 4, 'mae_validacion': 33.3084, 'epocas': 31, 'MAE': 38.64751609635167, 'RMSE': 62.659860930297135, 'R2': 0.959494117472094}
+  {'modelo': 'GE', 'ventana': '3', 'semilla': 0, 'mae_validacion': 37.074, 'epocas': 68, 'MAE': 33.32669664187366, 'RMSE': 55.354019591034294, 'R2': 0.9373363627454974}
+  {'modelo': 'GE', 'ventana': '3', 'semilla': 1, 'mae_validacion': 37.2132, 'epocas': 73, 'MAE': 39.14476770665622, 'RMSE': 66.86450715053198, 'R2': 0.9085658211521079}
+  {'modelo': 'GE', 'ventana': '3', 'semilla': 2, 'mae_validacion': 36.5494, 'epocas': 78, 'MAE': 32.51963639031618, 'RMSE': 54.13114926232557, 'R2': 0.9400744858717919}
+  {'modelo': 'GE', 'ventana': '3', 'semilla': 3, 'mae_validacion': 38.8078, 'epocas': 33, 'MAE': 28.54357706955926, 'RMSE': 46.12697799248582, 'R2': 0.9564861731985448}
+  {'modelo': 'GE', 'ventana': '3', 'semilla': 4, 'mae_validacion': 38.8707, 'epocas': 34, 'MAE': 28.17792432652551, 'RMSE': 45.45165854316363, 'R2': 0.9577509698414733}
+  {'modelo': 'GC1', 'ventana': '3', 'semilla': 0, 'mae_validacion': 36.6141, 'epocas': 112, 'MAE': 28.351053788480773, 'RMSE': 48.42047333080543, 'R2': 0.9520514658935266}
+  {'modelo': 'GC1', 'ventana': '3', 'semilla': 1, 'mae_validacion': 38.2597, 'epocas': 64, 'MAE': 28.702505864025937, 'RMSE': 48.493582802919605, 'R2': 0.9519065627884842}
+  {'modelo': 'GC1', 'ventana': '3', 'semilla': 2, 'mae_validacion': 36.3588, 'epocas': 104, 'MAE': 28.27744499919814, 'RMSE': 48.7714544884296, 'R2': 0.9513538260566826}
+  {'modelo': 'GC1', 'ventana': '3', 'semilla': 3, 'mae_validacion': 38.34, 'epocas': 37, 'MAE': 26.76387383699786, 'RMSE': 43.57899934034919, 'R2': 0.9611606654090546}
+  {'modelo': 'GC1', 'ventana': '3', 'semilla': 4, 'mae_validacion': 38.5191, 'epocas': 32, 'MAE': 27.03578993549292, 'RMSE': 43.83873330685232, 'R2': 0.9606963152922311}
+  {'modelo': 'GC2', 'ventana': '3', 'semilla': 0, 'mae_validacion': 37.1172, 'epocas': 77, 'MAE': 31.89272204184892, 'RMSE': 52.085489497531384, 'R2': 0.944518170514581}
+  {'modelo': 'GC2', 'ventana': '3', 'semilla': 1, 'mae_validacion': 37.5204, 'epocas': 57, 'MAE': 35.75641308506815, 'RMSE': 59.335553490620676, 'R2': 0.9279975508644256}
+  {'modelo': 'GC2', 'ventana': '3', 'semilla': 2, 'mae_validacion': 38.8064, 'epocas': 33, 'MAE': 27.80624752364089, 'RMSE': 44.82130659724369, 'R2': 0.9589147155134484}
+  {'modelo': 'GC2', 'ventana': '3', 'semilla': 3, 'mae_validacion': 38.7612, 'epocas': 33, 'MAE': 28.503055863401368, 'RMSE': 46.04595902812846, 'R2': 0.9566388972325551}
+  {'modelo': 'GC2', 'ventana': '3', 'semilla': 4, 'mae_validacion': 37.5549, 'epocas': 67, 'MAE': 32.633460815717285, 'RMSE': 53.51737002240431, 'R2': 0.9414257415400978}
+  {'modelo': 'GE', 'ventana': '4', 'semilla': 0, 'mae_validacion': 26.0206, 'epocas': 34, 'MAE': 25.73177181260539, 'RMSE': 40.34376139855162, 'R2': 0.9611775026556495}
+  {'modelo': 'GE', 'ventana': '4', 'semilla': 1, 'mae_validacion': 26.4539, 'epocas': 32, 'MAE': 25.30096665522573, 'RMSE': 39.651002154188724, 'R2': 0.9624993295517675}
+  {'modelo': 'GE', 'ventana': '4', 'semilla': 2, 'mae_validacion': 26.0448, 'epocas': 31, 'MAE': 25.247469062584823, 'RMSE': 39.668880915945365, 'R2': 0.9624655035865339}
+  {'modelo': 'GE', 'ventana': '4', 'semilla': 3, 'mae_validacion': 25.826, 'epocas': 31, 'MAE': 25.340430226920986, 'RMSE': 39.83371987086006, 'R2': 0.9621529158871704}
+  {'modelo': 'GE', 'ventana': '4', 'semilla': 4, 'mae_validacion': 25.8223, 'epocas': 32, 'MAE': 25.238331995703813, 'RMSE': 39.771126200401135, 'R2': 0.9622717662800284}
+  {'modelo': 'GC1', 'ventana': '4', 'semilla': 0, 'mae_validacion': 25.3273, 'epocas': 33, 'MAE': 25.983563723868315, 'RMSE': 41.753853062860166, 'R2': 0.9584162345359893}
+  {'modelo': 'GC1', 'ventana': '4', 'semilla': 1, 'mae_validacion': 25.4363, 'epocas': 35, 'MAE': 25.961689646099032, 'RMSE': 41.85715702650983, 'R2': 0.9582102136972482}
+  {'modelo': 'GC1', 'ventana': '4', 'semilla': 2, 'mae_validacion': 25.3992, 'epocas': 36, 'MAE': 25.409540743340475, 'RMSE': 40.73864797054518, 'R2': 0.9604137904934466}
+  {'modelo': 'GC1', 'ventana': '4', 'semilla': 3, 'mae_validacion': 25.61, 'epocas': 35, 'MAE': 25.68497028049785, 'RMSE': 41.259783933836, 'R2': 0.9593945250803613}
+  {'modelo': 'GC1', 'ventana': '4', 'semilla': 4, 'mae_validacion': 25.1771, 'epocas': 34, 'MAE': 25.264400732022334, 'RMSE': 40.51499515010195, 'R2': 0.9608472493861795}
+  {'modelo': 'GC2', 'ventana': '4', 'semilla': 0, 'mae_validacion': 26.0402, 'epocas': 34, 'MAE': 25.71968589991574, 'RMSE': 40.26558847522236, 'R2': 0.9613278073231262}
+  {'modelo': 'GC2', 'ventana': '4', 'semilla': 1, 'mae_validacion': 26.4536, 'epocas': 32, 'MAE': 25.304542856163913, 'RMSE': 39.63775481410692, 'R2': 0.9625243832008721}
+  {'modelo': 'GC2', 'ventana': '4', 'semilla': 2, 'mae_validacion': 26.0735, 'epocas': 31, 'MAE': 25.24700679348714, 'RMSE': 39.63648083702455, 'R2': 0.9625267921319496}
+  {'modelo': 'GC2', 'ventana': '4', 'semilla': 3, 'mae_validacion': 25.8434, 'epocas': 31, 'MAE': 25.339022371093233, 'RMSE': 39.79194083724247, 'R2': 0.9622322650108435}
+  {'modelo': 'GC2', 'ventana': '4', 'semilla': 4, 'mae_validacion': 25.8344, 'epocas': 32, 'MAE': 25.234025430441335, 'RMSE': 39.7132508759787, 'R2': 0.9623814913607712}
+                   MAE    RMSE     R2
+modelo ventana                       
+GC1    1        38.204  62.825  0.955
+       2        39.800  64.597  0.957
+       3        27.826  46.621  0.955
+       4        25.661  41.225  0.959
+GC2    1        37.314  61.457  0.957
+       2        38.671  62.902  0.959
+       3        31.318  51.161  0.946
+       4        25.369  39.809  0.962
+GE     1        37.229  61.363  0.957
+       2        38.681  62.893  0.959
+       3        32.343  53.586  0.940
+       4        25.372  39.854  0.962

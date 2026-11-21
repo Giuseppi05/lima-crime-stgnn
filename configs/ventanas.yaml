@@ -164,6 +164,12 @@ hiperparametros:
       dropout: 0.1
       entrada_meses: 12
       mae_validacion: 25.3273
+    P:
+      oculto: 64
+      lr: 0.003
+      dropout: 0.1
+      entrada_meses: 6
+      mae_validacion: 37.5448
   GC2:
     '1':
       oculto: 16
@@ -189,6 +195,12 @@ hiperparametros:
       dropout: 0.1
       entrada_meses: 12
       mae_validacion: 26.0402
+    P:
+      oculto: 16
+      lr: 0.003
+      dropout: 0.1
+      entrada_meses: 6
+      mae_validacion: 37.9944
   GE:
     '1':
       oculto: 16
@@ -214,6 +226,12 @@ hiperparametros:
       dropout: 0.1
       entrada_meses: 12
       mae_validacion: 26.0206
+    P:
+      oculto: 16
+      lr: 0.003
+      dropout: 0.1
+      entrada_meses: 6
+      mae_validacion: 37.9925
 salida_neuronal:
   elegida: residual
   mae_validacion_promedio:

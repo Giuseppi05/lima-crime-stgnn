@@ -1,0 +1,36 @@
+ajuste: 144 entrenamientos pendientes, 11 procesos
+  20/144  último: {'ventana': 'P', 'modelo': 'GE', 'salida': 'directa', 'oculto': 64, 'lr': 0.001, 'dropout': 0.3, 'entrada_meses': 12, 'mae_validacion': 45.4127, 'epocas': 31, 'segundos': 16.2}
+  40/144  último: {'ventana': 'P', 'modelo': 'GE', 'salida': 'residual', 'oculto': 32, 'lr': 0.003, 'dropout': 0.3, 'entrada_meses': 12, 'mae_validacion': 38.1011, 'epocas': 85, 'segundos': 22.3}
+  60/144  último: {'ventana': 'P', 'modelo': 'GC1', 'salida': 'directa', 'oculto': 32, 'lr': 0.001, 'dropout': 0.3, 'entrada_meses': 12, 'mae_validacion': 46.7021, 'epocas': 38, 'segundos': 2.9}
+  80/144  último: {'ventana': 'P', 'modelo': 'GC1', 'salida': 'residual', 'oculto': 16, 'lr': 0.003, 'dropout': 0.3, 'entrada_meses': 12, 'mae_validacion': 37.6119, 'epocas': 101, 'segundos': 4.6}
+  100/144  último: {'ventana': 'P', 'modelo': 'GC2', 'salida': 'directa', 'oculto': 16, 'lr': 0.001, 'dropout': 0.3, 'entrada_meses': 12, 'mae_validacion': 45.3328, 'epocas': 32, 'segundos': 3.7}
+  120/144  último: {'ventana': 'P', 'modelo': 'GC2', 'salida': 'directa', 'oculto': 64, 'lr': 0.003, 'dropout': 0.3, 'entrada_meses': 12, 'mae_validacion': 45.5255, 'epocas': 31, 'segundos': 18.0}
+  140/144  último: {'ventana': 'P', 'modelo': 'GC2', 'salida': 'residual', 'oculto': 64, 'lr': 0.001, 'dropout': 0.3, 'entrada_meses': 12, 'mae_validacion': 38.5058, 'epocas': 31, 'segundos': 14.5}
+  144/144  último: {'ventana': 'P', 'modelo': 'GC2', 'salida': 'residual', 'oculto': 64, 'lr': 0.003, 'dropout': 0.3, 'entrada_meses': 12, 'mae_validacion': 38.4801, 'epocas': 40, 'segundos': 11.0}
+salida          directa  residual
+modelo ventana                   
+GC1    P         40.009    37.545
+GC2    P         40.111    37.994
+GE     P         39.324    37.992 
+salida elegida: residual
+final: 15 corridas, 11 procesos
+  {'modelo': 'GE', 'ventana': 'P', 'semilla': 0, 'mae_validacion': 37.9925, 'epocas': 38, 'MAE': 28.873081224126377, 'RMSE': 52.30512667852574, 'R2': 0.7988325676662112}
+  {'modelo': 'GE', 'ventana': 'P', 'semilla': 1, 'mae_validacion': 37.9773, 'epocas': 49, 'MAE': 29.877917527082197, 'RMSE': 53.522258634812516, 'R2': 0.7893613702857607}
+  {'modelo': 'GE', 'ventana': 'P', 'semilla': 2, 'mae_validacion': 37.9886, 'epocas': 48, 'MAE': 29.44865565234182, 'RMSE': 52.973356679769445, 'R2': 0.7936596597667156}
+  {'modelo': 'GE', 'ventana': 'P', 'semilla': 3, 'mae_validacion': 37.7967, 'epocas': 41, 'MAE': 28.864500137956462, 'RMSE': 52.00960018983617, 'R2': 0.8010993571813372}
+  {'modelo': 'GE', 'ventana': 'P', 'semilla': 4, 'mae_validacion': 38.1327, 'epocas': 39, 'MAE': 29.05078967332215, 'RMSE': 52.6382196077328, 'R2': 0.7962622341567946}
+  {'modelo': 'GC1', 'ventana': 'P', 'semilla': 0, 'mae_validacion': 37.5448, 'epocas': 37, 'MAE': 32.26021110506655, 'RMSE': 57.19971554550339, 'R2': 0.7594214548335659}
+  {'modelo': 'GC1', 'ventana': 'P', 'semilla': 1, 'mae_validacion': 38.2746, 'epocas': 41, 'MAE': 32.71371518246275, 'RMSE': 59.18048212546797, 'R2': 0.7424709925695152}
+  {'modelo': 'GC1', 'ventana': 'P', 'semilla': 2, 'mae_validacion': 37.9476, 'epocas': 39, 'MAE': 33.48931879542814, 'RMSE': 60.08258390989079, 'R2': 0.7345600056188373}
+  {'modelo': 'GC1', 'ventana': 'P', 'semilla': 3, 'mae_validacion': 37.6638, 'epocas': 40, 'MAE': 33.225797129014886, 'RMSE': 59.186320061552635, 'R2': 0.7424201814917536}
+  {'modelo': 'GC1', 'ventana': 'P', 'semilla': 4, 'mae_validacion': 37.6814, 'epocas': 31, 'MAE': 29.077672319060316, 'RMSE': 52.54722987262597, 'R2': 0.7969659822384166}
+  {'modelo': 'GC2', 'ventana': 'P', 'semilla': 0, 'mae_validacion': 37.9944, 'epocas': 38, 'MAE': 28.830609546517042, 'RMSE': 52.27678522104269, 'R2': 0.7990505131698598}
+  {'modelo': 'GC2', 'ventana': 'P', 'semilla': 1, 'mae_validacion': 37.9946, 'epocas': 49, 'MAE': 29.862172005576745, 'RMSE': 53.52028843645952, 'R2': 0.7893768775626836}
+  {'modelo': 'GC2', 'ventana': 'P', 'semilla': 2, 'mae_validacion': 38.0157, 'epocas': 48, 'MAE': 29.374266470404585, 'RMSE': 52.926831128503615, 'R2': 0.7940219506571555}
+  {'modelo': 'GC2', 'ventana': 'P', 'semilla': 3, 'mae_validacion': 37.7914, 'epocas': 41, 'MAE': 28.885830748368363, 'RMSE': 52.00083576798667, 'R2': 0.8011663872008421}
+  {'modelo': 'GC2', 'ventana': 'P', 'semilla': 4, 'mae_validacion': 38.1374, 'epocas': 39, 'MAE': 29.01327628978345, 'RMSE': 52.57815798820169, 'R2': 0.7967269094059736}
+                   MAE    RMSE     R2
+modelo ventana                       
+GC1    P        32.153  57.639  0.755
+GC2    P        29.193  52.661  0.796
+GE     P        29.223  52.690  0.796

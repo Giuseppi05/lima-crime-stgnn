@@ -88,7 +88,11 @@ def main() -> None:
     for mod in ["GE", "GC2", "GC1"]:
         a = leer_atencion(mod)
         if len(a):
-            temp.append(a[a.tipo == "temporal"].groupby("desfase").peso.mean().rename(mod))
+            t = a[a.tipo == "temporal"].copy()
+            # cada corrida usa 6 o 12 meses de entrada: se promedia por separado (uniforme sería 1/6 o 1/12)
+            t["entrada"] = t.groupby(["ventana", "semilla"]).desfase.transform("max")
+            for L_, g in t.groupby("entrada"):
+                temp.append(g.groupby("desfase").peso.mean().rename(f"{mod} (L={L_})"))
     temp = pd.concat(temp, axis=1)
     temp.to_csv(FICHAS / "atencion_temporal.csv")
     fig, ax = plt.subplots(figsize=(7, 3.5))
@@ -103,7 +107,8 @@ def main() -> None:
     fig.savefig(FIGURAS / "atencion_temporal.png", dpi=150)
     plt.close(fig)
     md += ["## Atención temporal por desfase\n",
-           "Media sobre distritos, meses de prueba, ventanas y semillas. Con 6 meses de entrada solo existen los desfases 1–6.\n",
+           "Media sobre distritos, meses de prueba y semillas, por separado según los meses de entrada (L) que eligió la "
+           "validación en cada ventana. Una atención uniforme valdría 1/L (0,167 con L = 6; 0,083 con L = 12).\n",
            temp.round(4).to_markdown(), "", "Figura: `results/figuras/atencion_temporal.png`\n"]
 
     # ---------------- espacial

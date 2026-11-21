@@ -4,19 +4,10 @@ Criterio: menor MAE de validación promedio (mejor configuración de la grilla p
 
 |              |   directa |   residual |
 |:-------------|----------:|-----------:|
-| ('GC1', '1') |    29.749 |     25.228 |
-| ('GC1', '2') |    49.439 |     33.075 |
-| ('GC1', '3') |    36.097 |     36.614 |
-| ('GC1', '4') |    29.197 |     25.327 |
-| ('GC2', '1') |    34.893 |     25.449 |
-| ('GC2', '2') |    64.039 |     33.204 |
-| ('GC2', '3') |    50.448 |     37.117 |
-| ('GC2', '4') |    43.818 |     26.04  |
-| ('GE', '1')  |    34.863 |     25.458 |
-| ('GE', '2')  |    64.025 |     33.18  |
-| ('GE', '3')  |    50.436 |     37.074 |
-| ('GE', '4')  |    42.372 |     26.021 |
+| ('GC1', 'P') |    40.009 |     37.545 |
+| ('GC2', 'P') |    40.111 |     37.994 |
+| ('GE', 'P')  |    39.324 |     37.992 |
 
-Promedio por salida: {'directa': 44.115, 'residual': 30.316}. **Elegida: residual**, aplicada igual a GE, GC₁ y GC₂.
+Promedio por salida: {'directa': 39.815, 'residual': 37.844}. **Elegida: residual**, aplicada igual a GE, GC₁ y GC₂.
 
 Nota. Elaboración propia.
