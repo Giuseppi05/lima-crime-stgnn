@@ -20,7 +20,7 @@ Artefacto de investigación: **no está pensado para decisiones operativas de pa
 | v3 | pérdida Huber ponderada por distrito | no: empeora el MAE de validación | `results/v3/`; comparación en `results/fichas/comparacion_v1_v2_v3.md` |
 | v4 | los hiperparámetros de la ventana w se eligen con el MAE de validación promedio de las ventanas 1…w (`seleccion: multianual`) | **sí**: confirmación fuera de muestra dentro de la validación | `results/v4/`, `results/fichas/`; desarrollo y lectura en `results/experimentos/h1_v4_validacion_multianual/` |
 
-La v4 se entrenó en dos PCs con el mismo resultado: las 60 corridas pararon en la misma época y el MAE del GE es 32,139 en las dos. La atención y los casos adversos de la v4 se calcularon con la caché del grafo corregida (`correccion_cache_grafo: true`); los de la v1 a la v3 tenían ese error. Falta regenerar el mapa de riesgo de la v4 (`python -m src.mapa`, necesita los límites del INEI).
+La v4 se entrenó en dos PCs con el mismo resultado: las 60 corridas pararon en la misma época y el MAE del GE es 32,139 en las dos. La atención y los casos adversos de la v4 se calcularon con la caché del grafo corregida (`correccion_cache_grafo: true`); los de la v1 a la v3 tenían ese error. El mapa de riesgo de la v4 se generó con `python -m src.mapa` y los límites del INEI, cuyo SHA-256 coincide con el de `data/external/FUENTES.md`.
 
 ## Entorno
 
