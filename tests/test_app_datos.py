@@ -242,3 +242,14 @@ def test_resumen_adversos_coincide_con_ficha(v2):
     assert [f"{x:.3f}" for x in r.MAE] == [f"{float(x):.3f}" for x in tm["MAE"]]
     assert list(r.corridas_peor) == [int(x) for x in tm["corridas_peor"]]
     assert set(D.CASOS_GRAFO) <= set(r.caso)
+
+
+# ---------------------------------------------------------------- pestaña 6 (Mapa de riesgo)
+def test_mapa_riesgo_coincide_con_predicciones(v2):
+    m = D.mapa_riesgo(v2).set_index("ubigeo")
+    assert len(m) == 43
+    p = D.predicciones(v2)
+    g = p[(p.modelo == "GE") & (p.ventana == "4")]
+    u = g[g.periodo == g.periodo.max()].groupby("ubigeo").predicho.agg(["mean", "std"])
+    assert (u["mean"].round(2) - m.predicho).abs().max() < 0.011
+    assert (u["std"].round(2) - m.sd).abs().max() < 0.011
