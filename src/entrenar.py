@@ -198,9 +198,19 @@ def fase_congelar(vs):
     """Elige la salida (directa o residual) y la configuración de cada modelo y ventana solo con validación."""
     a = pd.read_csv(AJUSTE_CSV, dtype={"ventana": str})
     a = a[a.ventana.isin(vs)]
-    mejor = a.loc[a.groupby(["ventana", "modelo", "salida"]).mae_validacion.idxmin()]
-    # la salida se elige una sola vez para los tres modelos: menor MAE de validación promedio de las mejores configuraciones
     cfg = leer_config()
+    if cfg.get("seleccion", "un_anio") == "multianual" and "P" not in vs:
+        # v4 (candidato 3b): la configuración de la ventana w se elige con el MAE de validación promedio de las ventanas
+        # 1 … w (todos esos años son anteriores a la prueba de w). La ventana 1 queda igual; P no pasa por aquí.
+        clave = ["modelo", "salida", "oculto", "lr", "dropout", "entrada_meses"]
+        piv = a.pivot_table(index=clave, columns="ventana", values="mae_validacion")
+        orden = sorted(vs)
+        a = pd.concat([a[a.ventana == w].merge(piv[orden[:k + 1]].mean(1).rename("mae_multianual").reset_index(), on=clave)
+                       for k, w in enumerate(orden)], ignore_index=True)
+        mejor = a.loc[a.groupby(["ventana", "modelo", "salida"]).mae_multianual.idxmin()]
+    else:
+        mejor = a.loc[a.groupby(["ventana", "modelo", "salida"]).mae_validacion.idxmin()]
+    # la salida se elige una sola vez para los tres modelos: menor MAE de validación promedio de las mejores configuraciones
     if "P" in vs:  # la ventana de pandemia hereda la salida elegida con las 4 ventanas principales
         salida = cfg["salida_neuronal"]["elegida"]
         por_salida = mejor.groupby("salida").mae_validacion.mean()
@@ -213,7 +223,8 @@ def fase_congelar(vs):
     for _, r in mejor[mejor.salida == salida].iterrows():
         hpn.setdefault(r.modelo, {})[r.ventana] = {
             "oculto": int(r.oculto), "lr": float(r.lr), "dropout": float(r.dropout),
-            "entrada_meses": int(r.entrada_meses), "mae_validacion": float(r.mae_validacion)}
+            "entrada_meses": int(r.entrada_meses), "mae_validacion": float(r.mae_validacion),
+            **({"mae_validacion_multianual": round(float(r.mae_multianual), 4)} if "mae_multianual" in r else {})}
     guardar_config(cfg)
     t = mejor.pivot_table(index=["modelo", "ventana"], columns="salida", values="mae_validacion")
     # la ventana P va en su propio archivo: antes sobrescribía la tabla de las ventanas 1–4, que es la que decide

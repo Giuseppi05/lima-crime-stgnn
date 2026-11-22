@@ -108,17 +108,19 @@ ventanas:
     - 2025-09
 version:
   actual: h1_v4_validacion_multianual
-  h1_v4_validacion_multianual: 'v4 (candidato 3b): h1_base con los hiperparametros
-    elegidos por el MAE de validacion promedio de las ventanas 1..w (grilla de la
-    v2) en lugar del de un solo anio; ventana 1 y P como hoy. PENDIENTE: confirmacion
-    con 5 semillas'
+  h1_v4_validacion_multianual: 'v4 (candidato 3b), ADOPTADA: hiperparametros de la
+    ventana w elegidos con el MAE de validacion promedio de las ventanas 1..w (grilla
+    de la v2, sin grilla nueva); ventana 1 y P como en la v2. Confirmacion fuera de
+    muestra con 5 semillas: GE B-A -0,030 (w3) y -0,687 (w4), 9/10 pares (7/8 sin
+    semilla 0). Prueba (solo se informa): GE 33,347 -> 32,139 (v2 local). Lectura
+    en results/experimentos/h1_v4_validacion_multianual/fichas/lectura.md'
 entradas_modalidades: false
 ensamble_semillas: true
 salida_neuronal:
   elegida: residual
   mae_validacion_promedio:
-    directa: 44.1146
-    residual: 30.2876
+    directa: 44.4067
+    residual: 30.7242
 hiperparametros:
   xgboost:
     '1':
@@ -163,24 +165,28 @@ hiperparametros:
       dropout: 0.3
       entrada_meses: 6
       mae_validacion: 25.228
+      mae_validacion_multianual: 25.228
     '2':
-      oculto: 32
-      lr: 0.0003
-      dropout: 0.1
-      entrada_meses: 12
-      mae_validacion: 32.9646
+      oculto: 64
+      lr: 0.0001
+      dropout: 0.3
+      entrada_meses: 6
+      mae_validacion: 33.0091
+      mae_validacion_multianual: 29.139
     '3':
       oculto: 64
-      lr: 0.003
+      lr: 0.0001
+      dropout: 0.1
+      entrada_meses: 6
+      mae_validacion: 38.4017
+      mae_validacion_multianual: 32.2266
+    '4':
+      oculto: 32
+      lr: 0.001
       dropout: 0.3
       entrada_meses: 12
-      mae_validacion: 36.6141
-    '4':
-      oculto: 64
-      lr: 0.003
-      dropout: 0.1
-      entrada_meses: 12
-      mae_validacion: 25.3273
+      mae_validacion: 25.5071
+      mae_validacion_multianual: 30.6868
     P:
       oculto: 64
       lr: 0.003
@@ -194,24 +200,28 @@ hiperparametros:
       dropout: 0.3
       entrada_meses: 6
       mae_validacion: 25.4486
+      mae_validacion_multianual: 25.4486
     '2':
       oculto: 32
       lr: 0.003
-      dropout: 0.3
+      dropout: 0.1
       entrada_meses: 12
-      mae_validacion: 33.2043
+      mae_validacion: 33.2231
+      mae_validacion_multianual: 29.3462
     '3':
-      oculto: 64
+      oculto: 32
       lr: 0.003
       dropout: 0.1
-      entrada_meses: 6
-      mae_validacion: 37.1172
-    '4':
-      oculto: 64
-      lr: 0.0001
-      dropout: 0.3
       entrada_meses: 12
-      mae_validacion: 25.9182
+      mae_validacion: 38.388
+      mae_validacion_multianual: 32.3601
+    '4':
+      oculto: 32
+      lr: 0.003
+      dropout: 0.1
+      entrada_meses: 12
+      mae_validacion: 26.3336
+      mae_validacion_multianual: 30.8535
     P:
       oculto: 16
       lr: 0.003
@@ -225,28 +235,32 @@ hiperparametros:
       dropout: 0.3
       entrada_meses: 6
       mae_validacion: 25.4576
+      mae_validacion_multianual: 25.4576
     '2':
       oculto: 32
       lr: 0.003
-      dropout: 0.3
+      dropout: 0.1
       entrada_meses: 12
-      mae_validacion: 33.1799
+      mae_validacion: 33.1951
+      mae_validacion_multianual: 29.4016
     '3':
-      oculto: 64
+      oculto: 32
       lr: 0.003
       dropout: 0.1
-      entrada_meses: 6
-      mae_validacion: 37.074
-    '4':
-      oculto: 64
-      lr: 0.0001
-      dropout: 0.3
       entrada_meses: 12
-      mae_validacion: 25.9172
+      mae_validacion: 38.3929
+      mae_validacion_multianual: 32.3987
+    '4':
+      oculto: 16
+      lr: 0.003
+      dropout: 0.1
+      entrada_meses: 12
+      mae_validacion: 26.1059
+      mae_validacion_multianual: 30.8653
     P:
       oculto: 16
       lr: 0.003
       dropout: 0.1
       entrada_meses: 6
       mae_validacion: 37.9925
-seleccion: un_anio
+seleccion: multianual
