@@ -15,6 +15,8 @@ _CFG = leer_config()
 # meses entre el último mes observado y el mes predicho (1 en el AVC3); con H = 3 se predice t con datos hasta t − 3
 H = int(_CFG.get("horizonte_meses", 1))
 MODALIDADES_ENTRADA = bool(_CFG.get("entradas_modalidades", False))
+# v4: choque común de la ciudad como rasgo extra de los modelos neuronales (apagado en h1_base y en la v2)
+CHOQUE_COMUN = bool(_CFG.get("choque_comun", False))
 
 
 @dataclass

@@ -22,7 +22,7 @@ import torch
 
 from src.comun import ATENCION, FICHAS, PREDICCIONES, PROCESADOS, RESULTADOS, fijar_semilla, guardar_config, leer_config
 from src.modelos import STGNN, atencion_a_tablas
-from src.protocolo import H, Datos, Transformacion, cargar_datos, indices, metricas, tabla_predicciones, ventanas
+from src.protocolo import CHOQUE_COMUN, H, Datos, Transformacion, cargar_datos, indices, metricas, tabla_predicciones, ventanas
 
 MODELOS = {"GE": "vial", "GC1": None, "GC2": "geo"}
 MODELOS_DIR = RESULTADOS / "modelos"
@@ -44,7 +44,8 @@ def cargar_grafo(tipo: str | None, ubigeos: list[str], matriz: np.ndarray | None
 
 
 def tensor_entrada(d: Datos, tr: Transformacion) -> torch.Tensor:
-    """[meses, distritos, F]: objetivo transformado, mes seno, mes coseno, pandemia (+ hurto, robo y otras, si se usan)."""
+    """[meses, distritos, F]: objetivo transformado, mes seno, mes coseno, pandemia (+ hurto, robo y otras, si se usan)
+    (+ choque común de la ciudad, igual en los 43 nodos, si `choque_comun` está encendido)."""
     z = tr.directa(d.y)
     T, N = z.shape
     s = np.repeat(np.sin(2 * np.pi * d.mes / 12)[:, None], N, 1)
@@ -54,7 +55,18 @@ def tensor_entrada(d: Datos, tr: Transformacion) -> torch.Tensor:
     if d.extra is not None:
         zx = tr.directa_extra(d.extra)
         capas += [zx[..., k] for k in range(zx.shape[-1])]
+    if CHOQUE_COMUN:
+        capas.append(np.repeat(choque_comun(z, d.valido)[:, None], N, 1))
     return torch.tensor(np.stack(capas, -1), dtype=torch.float32)
+
+
+def choque_comun(z: np.ndarray, valido: np.ndarray) -> np.ndarray:
+    """[meses]: media de la ciudad del objetivo transformado en cada mes, solo con los distritos válidos de ese mes.
+
+    El valor del mes s usa solo las denuncias del mes s (y la media y desviación de entrenamiento que ya usa z),
+    así que dentro de la ventana de entrada de t (meses t − H − L + 1 … t − H) no entra nada de t ni posterior.
+    """
+    return np.nanmean(np.where(valido, z, np.nan), axis=1)
 
 
 def ventanas_x(X: torch.Tensor, idx: np.ndarray, L: int) -> torch.Tensor:
