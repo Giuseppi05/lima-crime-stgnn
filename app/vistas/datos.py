@@ -294,16 +294,19 @@ def _modelado(v):
                     f"validación promedio (residual {F.num(prom.get('residual'))} frente a directa "
                     f"{F.num(prom.get('directa'))}), aplicada igual a GE, GC₂ y GC₁.")
     aj = D.ajuste_hiperparametros(v)
+    archivo = D.archivo_ajuste(v)
     if aj is None:
-        pendiente(f"no existe `ajuste_hiperparametros.csv` en {v.etiqueta}; no se puede verificar la elección")
+        pendiente(f"no existe `{archivo}` en {v.etiqueta}; no se puede verificar la elección")
         return
     ver = D.verificar_configuracion(cfg, aj, sal.get("elegida", "residual"))
-    prom_aj = D.eleccion_salida_desde_ajuste(aj)
+    prom_aj = D.eleccion_salida_desde_ajuste(aj, cfg)
     columnas_prueba = [c for c in aj.columns if c not in ("mae_validacion",) and
                        any(k in c.lower() for k in ("mae", "rmse", "r2", "prueba"))]
+    criterio = ("menor MAE de validación promedio de las ventanas 1…w (selección multianual; la ventana 1 y la P "
+                "con su propio año)") if D.multianual(cfg) else "menor MAE de validación"
     if len(ver) and ver.coincide.all() and not columnas_prueba:
-        st.success(f"Verificación: las {len(ver)} configuraciones neuronales del yaml son las de menor MAE de "
-                   f"validación en `ajuste_hiperparametros.csv` ({ver.combinaciones.iloc[0]} combinaciones por modelo, "
+        st.success(f"Verificación: las {len(ver)} configuraciones neuronales del yaml son las de {criterio} en "
+                   f"`{archivo}` ({ver.combinaciones.iloc[0]} combinaciones por modelo, "
                    f"ventana y salida), y ese archivo no tiene columnas de prueba. Recalculado desde la grilla: residual "
                    f"{F.num(prom_aj.get('residual'), 4)}, directa {F.num(prom_aj.get('directa'), 4)}.", icon="✅")
     else:

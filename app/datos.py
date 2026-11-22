@@ -97,6 +97,8 @@ def detectar_versiones(results: Path = RESULTS) -> list[Version]:
     vs: list[Version] = []
     actual = version_actual()
     for d in results.glob("v*"):
+        if d.name == actual and (results / "fichas").is_dir():
+            continue  # resumen de la versión actual: ya aparece como la del artículo (results/fichas)
         if d.is_dir() and re.fullmatch(r"v\d+(\.\d+)*", d.name):
             fichas = d / "fichas" if (d / "fichas").is_dir() else d
             vs.append(Version(clave=d.name, etiqueta=f"{d.name} · results/{d.name}", fichas=fichas,
@@ -451,30 +453,61 @@ def configuracion(v: Version) -> dict | None:
     return leer_yaml(str(v.yaml))
 
 
+def archivo_ajuste(v: Version) -> str:
+    """Mismo nombre que usa `src/entrenar.py` (AJUSTE_CSV): sin sufijo en v1 y v2; si no, con el nombre de la versión."""
+    clave = version_actual() if v.articulo else v.clave.removeprefix("exp:")
+    return "ajuste_hiperparametros.csv" if clave in ("v1", "v2") else f"ajuste_hiperparametros_{clave}.csv"
+
+
 def ajuste_hiperparametros(v: Version) -> pd.DataFrame | None:
-    return _leer_csv(str(v.archivo("ajuste_hiperparametros.csv")), dtype={"ventana": str})
+    return _leer_csv(str(v.archivo(archivo_ajuste(v))), dtype={"ventana": str})
+
+
+def multianual(cfg: dict | None) -> bool:
+    return (cfg or {}).get("seleccion") == "multianual"
+
+
+def criterio_seleccion(ajuste: pd.DataFrame, cfg: dict | None) -> pd.DataFrame:
+    """Agrega `criterio`: el MAE con que se eligió cada configuración. Es el de su ventana o, con
+    `seleccion: multianual`, el promedio de los años de validación de las ventanas 1…w (como `fase_congelar`)."""
+    a = ajuste.copy()
+    a["criterio"] = a.mae_validacion
+    if multianual(cfg):
+        clave = ["modelo", "salida", "oculto", "lr", "dropout", "entrada_meses"]
+        piv = a[a.ventana.isin(VENTANAS_PRUEBA)].pivot_table(index=clave, columns="ventana", values="mae_validacion")
+        orden = sorted(piv.columns)
+        for k, w in enumerate(orden):
+            prom = piv[orden[:k + 1]].mean(axis=1).rename("prom").reset_index()
+            fila = a.ventana == w
+            a.loc[fila, "criterio"] = a.loc[fila, clave].merge(prom, on=clave, how="left")["prom"].to_numpy()
+    return a
 
 
 def verificar_configuracion(cfg: dict, ajuste: pd.DataFrame, salida: str) -> pd.DataFrame:
-    """¿La configuración del yaml es la de menor MAE de validación en la grilla (con la salida elegida)?"""
+    """¿La configuración del yaml es la de menor criterio de validación en la grilla (con la salida elegida)?"""
+    a = criterio_seleccion(ajuste, cfg)
     filas = []
     for m in NEURONALES:
         for w, h in (cfg.get("hiperparametros", {}).get(m) or {}).items():
-            s = ajuste[(ajuste.modelo == m) & (ajuste.ventana == str(w)) & (ajuste.salida == salida)]
+            s = a[(a.modelo == m) & (a.ventana == str(w)) & (a.salida == salida)]
             if s.empty:
                 continue
-            b = s.loc[s.mae_validacion.idxmin()]
+            b = s.loc[s.criterio.idxmin()]
             igual = (b.oculto, b.lr, b.dropout, b.entrada_meses) == (h["oculto"], h["lr"], h["dropout"],
                                                                      h["entrada_meses"])
-            filas.append({"modelo": m, "ventana": str(w), "combinaciones": len(s), "mae_yaml": h["mae_validacion"],
-                          "mae_min_grilla": b.mae_validacion, "coincide": bool(igual)})
+            filas.append({"modelo": m, "ventana": str(w), "combinaciones": len(s),
+                          "mae_yaml": h.get("mae_validacion_multianual", h["mae_validacion"]),
+                          "mae_min_grilla": b.criterio, "coincide": bool(igual)})
     return pd.DataFrame(filas)
 
 
-def eleccion_salida_desde_ajuste(ajuste: pd.DataFrame) -> pd.Series:
-    """MAE de validación promedio por salida: mejor configuración por modelo y ventana (1–4), luego promedio."""
-    a = ajuste[ajuste.ventana.isin(VENTANAS_PRUEBA)]
-    return a.groupby(["modelo", "ventana", "salida"]).mae_validacion.min().unstack().mean()
+def eleccion_salida_desde_ajuste(ajuste: pd.DataFrame, cfg: dict | None = None) -> pd.Series:
+    """MAE de validación promedio por salida: mejor configuración por modelo y ventana (1–4) según el criterio de
+    selección, luego el promedio de su MAE de validación (como `fase_congelar`)."""
+    a = criterio_seleccion(ajuste, cfg)
+    a = a[a.ventana.isin(VENTANAS_PRUEBA)]
+    mejor = a.loc[a.groupby(["modelo", "ventana", "salida"]).criterio.idxmin()]
+    return mejor.groupby("salida").mae_validacion.mean()
 
 
 # ---------------------------------------------------------------- atención (OE3)

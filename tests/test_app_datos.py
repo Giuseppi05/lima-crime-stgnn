@@ -1,4 +1,4 @@
-"""Pruebas mínimas de la interfaz de resultados: lectores de la v2 y cifras de la tabla global.
+"""Pruebas mínimas de la interfaz de resultados: lectores de la versión del artículo y cifras de la tabla global.
 
 Uso: python -m pytest tests/test_app_datos.py
 """
@@ -22,7 +22,7 @@ AVC3 = RAIZ.parent / "AVC3.docx"  # fuera del repositorio: la prueba de citas se
 
 
 @pytest.fixture(scope="module")
-def v2() -> D.Version:
+def art() -> D.Version:
     vs = [v for v in D.detectar_versiones() if v.articulo]
     assert len(vs) == 1, "debe existir exactamente una versión del artículo (results/fichas)"
     return vs[0]
@@ -35,24 +35,24 @@ def test_detecta_v1_y_articulo():
 
 
 @pytest.mark.parametrize("lector, columnas, filas", [
-    (D.metricas_global, ["modelo", "MAE", "RMSE", "R2", "MASE", "MAE_sd", "RMSE_sd"], 7),
-    (D.metricas_por_ventana, ["modelo", "ventana", "MAE", "RMSE", "R2", "MAE_sd"], 28),
-    (D.metricas_por_distrito, ["modelo", "ubigeo", "MAE", "RMSE", "distrito"], 7 * 43),
+    (D.metricas_global, ["modelo", "MAE", "RMSE", "R2", "MASE", "MAE_sd", "RMSE_sd"], 10),
+    (D.metricas_por_ventana, ["modelo", "ventana", "MAE", "RMSE", "R2", "MAE_sd"], 40),
+    (D.metricas_por_distrito, ["modelo", "ubigeo", "MAE", "RMSE", "distrito"], 10 * 43),
     (D.corridas_neuronales, ["modelo", "ventana", "semilla", "mae_validacion", "MAE", "RMSE", "R2"], 60),
-    (D.pruebas_estadisticas, ["comparacion", "MAE_GE", "MAE_rival", "RMSE_GE", "RMSE_rival", "p", "GE_supera"], 4),
-    (D.equidad_por_distrito, ["modelo", "ubigeo", "error_rel", "distrito", "sector", "volumen_entrenamiento"], 7 * 43),
-    (D.equidad_resumen, ["modelo", "brecha", "brecha_sin_playa", "media_bajo", "media_medio", "media_alto"], 7),
-    (D.equidad_sectores, ["modelo", "prueba", "estadistico", "p", "significativa"], 7),
+    (D.pruebas_estadisticas, ["comparacion", "MAE_GE", "MAE_rival", "RMSE_GE", "RMSE_rival", "p", "GE_supera"], 7),
+    (D.equidad_por_distrito, ["modelo", "ubigeo", "error_rel", "distrito", "sector", "volumen_entrenamiento"], 10 * 43),
+    (D.equidad_resumen, ["modelo", "brecha", "brecha_sin_playa", "media_bajo", "media_medio", "media_alto"], 10),
+    (D.equidad_sectores, ["modelo", "prueba", "estadistico", "p", "significativa"], 10),
 ])
-def test_lectores_v2(v2, lector, columnas, filas):
-    df = lector(v2)
+def test_lectores_v2(art, lector, columnas, filas):
+    df = lector(art)
     assert df is not None, f"{lector.__name__} no encontró su archivo"
     assert set(columnas) <= set(df.columns)
     assert len(df) >= filas if lector is D.metricas_por_ventana else len(df) == filas
 
 
-def test_predicciones_v2(v2):
-    p = D.predicciones(v2)
+def test_predicciones_v2(art):
+    p = D.predicciones(art)
     assert p is not None
     assert {"ubigeo", "periodo", "real", "predicho", "valido", "modelo", "ventana", "semilla"} <= set(p.columns)
     assert p.ubigeo.str.len().eq(6).all()
@@ -61,45 +61,46 @@ def test_predicciones_v2(v2):
     assert len(p) == (3 * 5 * 5 + 4 * 5) * 516
 
 
-def test_lector_ausente_devuelve_none(v2):
+def test_lector_ausente_devuelve_none(art):
     v1 = next(v for v in D.detectar_versiones() if v.clave == "v1")
     assert D.equidad_resumen(v1) is None
     assert D.predicciones(v1) is None
 
 
-def test_tabla_global_coincide_con_archivo(v2):
+def test_tabla_global_coincide_con_archivo(art):
     """Las cifras que muestra la tabla global son las de metricas_global.csv, con coma decimal y 3 decimales."""
     from app.vistas import desempeno  # noqa: F401  (importa la vista: debe cargar sin Streamlit en ejecución)
-    crudo = pd.read_csv(v2.archivo("metricas_global.csv")).set_index("modelo")
-    g = D.metricas_global(v2).set_index("modelo")
+    crudo = pd.read_csv(art.archivo("metricas_global.csv")).set_index("modelo")
+    g = D.metricas_global(art).set_index("modelo")
     pd.testing.assert_frame_equal(g, crudo)
-    assert F.ms(g.loc["GE", "MAE"], g.loc["GE", "MAE_sd"]) == "33,469 ± 1,368"
-    assert F.ms(g.loc["GE", "RMSE"], g.loc["GE", "RMSE_sd"]) == "55,335 ± 2,559"
+    assert D.version_actual() == "v4"
+    assert F.ms(g.loc["GE", "MAE"], g.loc["GE", "MAE_sd"]) == "32,139 ± 0,213"
+    assert F.ms(g.loc["GE", "RMSE"], g.loc["GE", "RMSE_sd"]) == "53,051 ± 0,385"
     assert F.ms(g.loc["xgboost", "MAE"], g.loc["xgboost", "MAE_sd"]) == "57,039"
     for m, fila in g.iterrows():
         assert F.num(fila.MAE) == f"{fila.MAE:.3f}".replace(".", ",")
 
 
-def test_global_recalculada_desde_predicciones(v2):
-    r = D.metricas_global_desde_predicciones(D.predicciones(v2))
-    g = D.metricas_global(v2).set_index("modelo")
+def test_global_recalculada_desde_predicciones(art):
+    r = D.metricas_global_desde_predicciones(D.predicciones(art))
+    g = D.metricas_global(art).set_index("modelo")
     for c in ["MAE", "RMSE", "R2", "MAE_sd", "RMSE_sd"]:
         assert (r[c] - g.loc[r.index, c]).abs().max() < 1e-9, c
 
 
-def test_regla_avc3_coincide(v2):
-    p = D.pruebas_estadisticas(v2)
+def test_regla_avc3_coincide(art):
+    p = D.pruebas_estadisticas(art)
     assert (p.apply(D.regla_avc3, axis=1) == p.GE_supera).all()
 
 
-def test_mismo_conjunto_de_prueba(v2):
-    r = D.verificar_mismo_conjunto(D.predicciones(v2))
+def test_mismo_conjunto_de_prueba(art):
+    r = D.verificar_mismo_conjunto(D.predicciones(art))
     assert r.iguales.all()
     assert (r.celdas == 516).all()
 
 
-def test_r2_por_distrito(v2):
-    p = D.predicciones(v2)
+def test_r2_por_distrito(art):
+    p = D.predicciones(art)
     for modo in ["ventana", "48"]:
         r = D.r2_por_distrito(p, modo)
         assert r.groupby("modelo").size().eq(43).all()
@@ -107,17 +108,18 @@ def test_r2_por_distrito(v2):
         assert r.loc[r.modelo == "mes_anterior", "n_semillas"].eq(1).all()
 
 
-def test_brecha_y_composicion(v2):
-    r = D.equidad_resumen(v2)
+def test_brecha_y_composicion(art):
+    r = D.equidad_resumen(art)
     b = D.brecha_entre_sectores(r)
     assert (b >= 0).all()
-    c = D.composicion_sectores(D.equidad_por_distrito(v2))
+    c = D.composicion_sectores(D.equidad_por_distrito(art))
     assert c.n.sum() == 43 and list(c.sector) == D.SECTORES
 
 
-def test_aviso_cache(v2, tmp_path):
-    # sin la clave en el yaml, el aviso va en todas las versiones actuales
-    assert all(D.aviso_cache_grafo(v) for v in D.detectar_versiones())
+def test_aviso_cache(art, tmp_path):
+    # el aviso sale salvo que el yaml de la versión declare la corrección (la v4 la declara; la v1, no)
+    assert not D.aviso_cache_grafo(art)
+    assert D.aviso_cache_grafo(next(v for v in D.detectar_versiones() if v.clave == "v1"))
     (tmp_path / "fichas").mkdir()
     (tmp_path / "fichas" / "version.yaml").write_text("correccion_cache_grafo: true\n", encoding="utf-8")
     corregida = D.Version(clave="exp:h1_base", etiqueta="", fichas=tmp_path / "fichas")
@@ -175,12 +177,12 @@ def test_solapamiento_ge_gc2():
     assert F.num(s["jaccard"]) == "0,908"
 
 
-def test_validacion_grafos_coincide_con_ficha(v2):
+def test_validacion_grafos_coincide_con_ficha(art):
     nod = D.nodos()
     ub = list(nod.ubigeo)
     rg, rv = D.resumen_grafo(D.aristas("geo"), ub), D.resumen_grafo(D.aristas("vial"), ub)
     assert (rg["aristas"], rv["aristas"]) == (98, 89) and rg["conectado"] and rv["conectado"]
-    g = D.tabla_md(D.validacion_grafos_md(v2), "Grafos")
+    g = D.tabla_md(D.validacion_grafos_md(art), "Grafos")
     assert list(g["Aristas"]) == ["98", "89"]
     assert list(g["Grado medio"]) == [f"{rg['grado_medio']:.2f}", f"{rv['grado_medio']:.2f}"]
     d = D.distancia_red_vs_recta(nod)
@@ -188,67 +190,70 @@ def test_validacion_grafos_coincide_con_ficha(v2):
     assert f"{d['cociente_min']:.3f}" == "1.038" and f"{d['cociente_mediana']:.3f}" == "1.215"
 
 
-def test_cobertura_coincide_con_calidad(v2):
+def test_cobertura_coincide_con_calidad(art):
     p = D.panel()
     c = D.cobertura(p).set_index("estado").celdas
     assert (c["observado"], c["cero"], c["sin_informacion"]) == (4446, 60, 9)
-    assert "observado 4446, cero 60, sin_informacion 9" in D.calidad_md(v2)
+    assert "observado 4446, cero 60, sin_informacion 9" in D.calidad_md(art)
     assert len(p) == 43 * 105 and not p.duplicated(["ubigeo", "periodo"]).any()
     assert F.entero(p.objetivo.sum()) == "957 705"
 
 
-def test_configuracion_es_la_de_validacion(v2):
-    cfg, aj = D.configuracion(v2), D.ajuste_hiperparametros(v2)
+def test_configuracion_es_la_de_validacion(art):
+    cfg, aj = D.configuracion(art), D.ajuste_hiperparametros(art)
+    assert D.multianual(cfg) and D.archivo_ajuste(art) == "ajuste_hiperparametros_v4.csv"
     ver = D.verificar_configuracion(cfg, aj, cfg["salida_neuronal"]["elegida"])
     assert len(ver) == 15 and ver.coincide.all()
-    prom = D.eleccion_salida_desde_ajuste(aj)
+    prom = D.eleccion_salida_desde_ajuste(aj, cfg)
     esperado = cfg["salida_neuronal"]["mae_validacion_promedio"]
     assert round(prom["residual"], 4) == esperado["residual"] and round(prom["directa"], 4) == esperado["directa"]
 
 
 # ---------------------------------------------------------------- pestaña 3 (Interpretabilidad, OE3)
-def test_lectores_atencion_v2(v2):
-    assert list(D.atencion_temporal(v2).desfase) == list(range(1, 13))
-    s = D.atencion_spearman(v2)
+def test_lectores_atencion_v2(art):
+    assert list(D.atencion_temporal(art).desfase) == list(range(1, 13))
+    s = D.atencion_spearman(art)
     assert set(s.modelo) == {"GE", "GC2"}
     assert s.loc[(s.modelo == "GE") & (s.contra == "contiguo"), "nota"].eq("constante").all()
-    assert len(D.atencion_pares(v2, "GE")) == 89 and len(D.atencion_pares(v2, "GC2")) == 98
-    assert len(D.atencion_fidelidad(v2)) == 20
+    assert len(D.atencion_pares(art, "GE")) == 89 and len(D.atencion_pares(art, "GC2")) == 98
+    assert len(D.atencion_fidelidad(art)) == 20
 
 
-def test_autoatencion_y_fidelidad_coinciden_con_ficha(v2):
+def test_autoatencion_y_fidelidad_coinciden_con_ficha(art):
     import re
-    md = D.atencion_md(v2)
-    a = D.autoatencion(v2)
+    md = D.atencion_md(art)
+    a = D.autoatencion(art)
     ge, gc2 = re.search(r"GE (\d+\.\d+); GC₂ (\d+\.\d+)", md).groups()
     assert (f"{a['GE']:.3f}", f"{a['GC2']:.3f}") == (ge, gc2)
-    f = D.atencion_fidelidad(v2)
+    f = D.atencion_fidelidad(art)
     assert f"ΔMAE top {f.dMAE_top.mean():.3f}; ΔMAE azar {f.dMAE_azar.mean():.3f}" in md
     assert f"{int((f.dMAE_top > f.dMAE_azar).sum())} de 20" in md
 
 
 # ---------------------------------------------------------------- pestaña 5 (Casos adversos)
-def test_pandemia_v2(v2):
-    pa = D.pandemia(v2)
-    assert len(pa) == 7 and {"MAE", "MAE_sd", "RMSE", "R2"} <= set(pa.columns)
-    c = D.corridas_pandemia(v2)
+def test_pandemia_v2(art):
+    pa = D.pandemia(art)
+    assert len(pa) == 10 and {"MAE", "MAE_sd", "RMSE", "R2"} <= set(pa.columns)  # 7 + promedio de semillas
+    c = D.corridas_pandemia(art)
     ge = pa.set_index("modelo").loc[D.NOMBRES["GE"]]
     assert round(c[c.modelo == "GE"].MAE.mean(), 3) == ge.MAE
 
 
-def test_resumen_adversos_coincide_con_ficha(v2):
-    r = D.resumen_adversos(D.casos_adversos(v2))
-    tm = D.tablas_md(D.casos_adversos_md(v2))[0][1]
+def test_resumen_adversos_coincide_con_ficha(art):
+    r = D.resumen_adversos(D.casos_adversos(art))
+    tm = D.tablas_md(D.casos_adversos_md(art))[0][1]
     assert [f"{x:.3f}" for x in r.MAE] == [f"{float(x):.3f}" for x in tm["MAE"]]
     assert list(r.corridas_peor) == [int(x) for x in tm["corridas_peor"]]
     assert set(D.CASOS_GRAFO) <= set(r.caso)
 
 
 # ---------------------------------------------------------------- pestaña 6 (Mapa de riesgo)
-def test_mapa_riesgo_coincide_con_predicciones(v2):
-    m = D.mapa_riesgo(v2).set_index("ubigeo")
+def test_mapa_riesgo_coincide_con_predicciones(art):
+    if D.mapa_riesgo(art) is None:
+        pytest.skip("falta el mapa de la v4: correr python -m src.mapa en la PC con los límites del INEI")
+    m = D.mapa_riesgo(art).set_index("ubigeo")
     assert len(m) == 43
-    p = D.predicciones(v2)
+    p = D.predicciones(art)
     g = p[(p.modelo == "GE") & (p.ventana == "4")]
     u = g[g.periodo == g.periodo.max()].groupby("ubigeo").predicho.agg(["mean", "std"])
     assert (u["mean"].round(2) - m.predicho).abs().max() < 0.011
@@ -256,14 +261,19 @@ def test_mapa_riesgo_coincide_con_predicciones(v2):
 
 
 # ---------------------------------------------------------------- pestaña 7 (Pendientes)
-def test_pendientes_v2(v2):
+def test_pendientes_v2(art):
     from app.vistas import pendientes
-    filas = {f["Tema"]: f for f in pendientes.items(v2)}
+    filas = {f["Tema"]: f for f in pendientes.items(art)}
     assert "Jaccard 0,908" in filas["Solapamiento GE–GC₂ (Jaccard)"]["Detalle"]
-    assert filas["Error de caché del grafo"]["Estado"] == "En revisión"
-    assert filas["Reproducción de la v2 en otra PC"]["Fuente"] == "reproducción local, 21 nov."
+    assert filas["Error de caché del grafo"]["Estado"] == "Corregido (declarado en el yaml)"
+    assert filas["Reproducción en otra PC"]["Estado"] == "Cubierto"
+    assert "60 de 60" in filas["Reproducción en otra PC"]["Detalle"]
     assert filas["Fig. 1 y Fig. 2"]["Estado"] == "Falta"
-    assert "85,304" in filas["`metricas_referencias.csv` desactualizado"]["Detalle"]
+    assert filas["Selección multianual de hiperparámetros"]["Estado"] == "Redacción"
+    assert "de 20 corridas" in filas["Fidelidad de la atención"]["Detalle"]
+    assert "`metricas_referencias.csv` desactualizado" not in filas
+    if D.mapa_riesgo(art) is None:
+        assert filas["Mapa reproducible"]["Estado"] == "Falta"
 
 
 def test_numeracion_cubre_todas_las_vistas():
