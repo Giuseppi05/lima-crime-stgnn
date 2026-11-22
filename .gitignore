@@ -8,3 +8,6 @@ __pycache__/
 # notas internas del equipo: no se publican
 CONTEXTO_GNN.md
 PROMPT_INICIO.md
+
+# exportaciones de la interfaz de resultados
+app/exportes/
