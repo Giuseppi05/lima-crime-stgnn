@@ -22,7 +22,7 @@ import torch
 
 from src.comun import ATENCION, FICHAS, PREDICCIONES, PROCESADOS, RESULTADOS, fijar_semilla, guardar_config, leer_config
 from src.modelos import STGNN, atencion_a_tablas
-from src.protocolo import H, Datos, Transformacion, cargar_datos, indices, metricas, tabla_predicciones, ventanas
+from src.protocolo import CHOQUE_COMUN, H, Datos, Transformacion, cargar_datos, indices, metricas, tabla_predicciones, ventanas
 
 MODELOS = {"GE": "vial", "GC1": None, "GC2": "geo"}
 MODELOS_DIR = RESULTADOS / "modelos"
@@ -44,7 +44,8 @@ def cargar_grafo(tipo: str | None, ubigeos: list[str], matriz: np.ndarray | None
 
 
 def tensor_entrada(d: Datos, tr: Transformacion) -> torch.Tensor:
-    """[meses, distritos, F]: objetivo transformado, mes seno, mes coseno, pandemia (+ hurto, robo y otras, si se usan)."""
+    """[meses, distritos, F]: objetivo transformado, mes seno, mes coseno, pandemia (+ hurto, robo y otras, si se usan)
+    (+ choque común de la ciudad, igual en los 43 nodos, si `choque_comun` está encendido)."""
     z = tr.directa(d.y)
     T, N = z.shape
     s = np.repeat(np.sin(2 * np.pi * d.mes / 12)[:, None], N, 1)
@@ -54,7 +55,18 @@ def tensor_entrada(d: Datos, tr: Transformacion) -> torch.Tensor:
     if d.extra is not None:
         zx = tr.directa_extra(d.extra)
         capas += [zx[..., k] for k in range(zx.shape[-1])]
+    if CHOQUE_COMUN:
+        capas.append(np.repeat(choque_comun(z, d.valido)[:, None], N, 1))
     return torch.tensor(np.stack(capas, -1), dtype=torch.float32)
+
+
+def choque_comun(z: np.ndarray, valido: np.ndarray) -> np.ndarray:
+    """[meses]: media de la ciudad del objetivo transformado en cada mes, solo con los distritos válidos de ese mes.
+
+    El valor del mes s usa solo las denuncias del mes s (y la media y desviación de entrenamiento que ya usa z),
+    así que dentro de la ventana de entrada de t (meses t − H − L + 1 … t − H) no entra nada de t ni posterior.
+    """
+    return np.nanmean(np.where(valido, z, np.nan), axis=1)
 
 
 def ventanas_x(X: torch.Tensor, idx: np.ndarray, L: int) -> torch.Tensor:
@@ -186,9 +198,19 @@ def fase_congelar(vs):
     """Elige la salida (directa o residual) y la configuración de cada modelo y ventana solo con validación."""
     a = pd.read_csv(AJUSTE_CSV, dtype={"ventana": str})
     a = a[a.ventana.isin(vs)]
-    mejor = a.loc[a.groupby(["ventana", "modelo", "salida"]).mae_validacion.idxmin()]
-    # la salida se elige una sola vez para los tres modelos: menor MAE de validación promedio de las mejores configuraciones
     cfg = leer_config()
+    if cfg.get("seleccion", "un_anio") == "multianual" and "P" not in vs:
+        # v4 (candidato 3b): la configuración de la ventana w se elige con el MAE de validación promedio de las ventanas
+        # 1 … w (todos esos años son anteriores a la prueba de w). La ventana 1 queda igual; P no pasa por aquí.
+        clave = ["modelo", "salida", "oculto", "lr", "dropout", "entrada_meses"]
+        piv = a.pivot_table(index=clave, columns="ventana", values="mae_validacion")
+        orden = sorted(vs)
+        a = pd.concat([a[a.ventana == w].merge(piv[orden[:k + 1]].mean(1).rename("mae_multianual").reset_index(), on=clave)
+                       for k, w in enumerate(orden)], ignore_index=True)
+        mejor = a.loc[a.groupby(["ventana", "modelo", "salida"]).mae_multianual.idxmin()]
+    else:
+        mejor = a.loc[a.groupby(["ventana", "modelo", "salida"]).mae_validacion.idxmin()]
+    # la salida se elige una sola vez para los tres modelos: menor MAE de validación promedio de las mejores configuraciones
     if "P" in vs:  # la ventana de pandemia hereda la salida elegida con las 4 ventanas principales
         salida = cfg["salida_neuronal"]["elegida"]
         por_salida = mejor.groupby("salida").mae_validacion.mean()
@@ -201,7 +223,8 @@ def fase_congelar(vs):
     for _, r in mejor[mejor.salida == salida].iterrows():
         hpn.setdefault(r.modelo, {})[r.ventana] = {
             "oculto": int(r.oculto), "lr": float(r.lr), "dropout": float(r.dropout),
-            "entrada_meses": int(r.entrada_meses), "mae_validacion": float(r.mae_validacion)}
+            "entrada_meses": int(r.entrada_meses), "mae_validacion": float(r.mae_validacion),
+            **({"mae_validacion_multianual": round(float(r.mae_multianual), 4)} if "mae_multianual" in r else {})}
     guardar_config(cfg)
     t = mejor.pivot_table(index=["modelo", "ventana"], columns="salida", values="mae_validacion")
     # la ventana P va en su propio archivo: antes sobrescribía la tabla de las ventanas 1–4, que es la que decide
