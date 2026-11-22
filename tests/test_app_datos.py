@@ -204,3 +204,24 @@ def test_configuracion_es_la_de_validacion(v2):
     prom = D.eleccion_salida_desde_ajuste(aj)
     esperado = cfg["salida_neuronal"]["mae_validacion_promedio"]
     assert round(prom["residual"], 4) == esperado["residual"] and round(prom["directa"], 4) == esperado["directa"]
+
+
+# ---------------------------------------------------------------- pestaña 3 (Interpretabilidad, OE3)
+def test_lectores_atencion_v2(v2):
+    assert list(D.atencion_temporal(v2).desfase) == list(range(1, 13))
+    s = D.atencion_spearman(v2)
+    assert set(s.modelo) == {"GE", "GC2"}
+    assert s.loc[(s.modelo == "GE") & (s.contra == "contiguo"), "nota"].eq("constante").all()
+    assert len(D.atencion_pares(v2, "GE")) == 89 and len(D.atencion_pares(v2, "GC2")) == 98
+    assert len(D.atencion_fidelidad(v2)) == 20
+
+
+def test_autoatencion_y_fidelidad_coinciden_con_ficha(v2):
+    import re
+    md = D.atencion_md(v2)
+    a = D.autoatencion(v2)
+    ge, gc2 = re.search(r"GE (\d+\.\d+); GC₂ (\d+\.\d+)", md).groups()
+    assert (f"{a['GE']:.3f}", f"{a['GC2']:.3f}") == (ge, gc2)
+    f = D.atencion_fidelidad(v2)
+    assert f"ΔMAE top {f.dMAE_top.mean():.3f}; ΔMAE azar {f.dMAE_azar.mean():.3f}" in md
+    assert f"{int((f.dMAE_top > f.dMAE_azar).sum())} de 20" in md

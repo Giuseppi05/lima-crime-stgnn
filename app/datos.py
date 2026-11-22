@@ -475,3 +475,102 @@ def eleccion_salida_desde_ajuste(ajuste: pd.DataFrame) -> pd.Series:
     """MAE de validación promedio por salida: mejor configuración por modelo y ventana (1–4), luego promedio."""
     a = ajuste[ajuste.ventana.isin(VENTANAS_PRUEBA)]
     return a.groupby(["modelo", "ventana", "salida"]).mae_validacion.min().unstack().mean()
+
+
+# ---------------------------------------------------------------- atención (OE3)
+def atencion_temporal(v: Version) -> pd.DataFrame | None:
+    return _leer_csv(str(v.archivo("atencion_temporal.csv")))
+
+
+def atencion_spearman(v: Version) -> pd.DataFrame | None:
+    return _leer_csv(str(v.archivo("atencion_spearman.csv")))
+
+
+def atencion_pares(v: Version, modelo: str) -> pd.DataFrame | None:
+    return _leer_csv(str(v.archivo(f"atencion_espacial_pares_{modelo}.csv")), dtype={"a": str, "b": str})
+
+
+def atencion_fidelidad(v: Version) -> pd.DataFrame | None:
+    return _leer_csv(str(v.archivo("atencion_fidelidad.csv")), dtype={"ventana": str})
+
+
+def atencion_md(v: Version) -> str | None:
+    return leer_texto(str(v.archivo("atencion.md")))
+
+
+@_cache
+def _autoatencion(carpeta: str) -> dict[str, float]:
+    """Peso medio del propio distrito en el GAT (origen = destino), ventanas 1–4 y todas las semillas."""
+    out = {}
+    for modelo in ["GE", "GC2"]:
+        suma, n = 0.0, 0
+        for f in sorted(Path(carpeta).glob(f"{modelo}_*_*.csv")):
+            if not re.match(rf"^{modelo}_[1-4]_\d+\.csv$", f.name):
+                continue
+            t = pd.read_csv(f, dtype={"origen": str, "destino": str})
+            e = t[(t.tipo == "espacial") & (t.origen == t.destino)].peso
+            suma, n = suma + e.sum(), n + len(e)
+        if n:
+            out[modelo] = suma / n
+    return out
+
+
+def autoatencion(v: Version) -> dict[str, float] | None:
+    return None if v.atencion is None else _autoatencion(str(v.atencion))
+
+
+def entrada_elegida(cfg: dict) -> pd.DataFrame:
+    """Meses de entrada (L) que eligió la validación por modelo y ventana (1–4)."""
+    filas = [{"modelo": m, "ventana": str(w), "L": h["entrada_meses"]}
+             for m in NEURONALES for w, h in ((cfg.get("hiperparametros") or {}).get(m) or {}).items()
+             if str(w) in VENTANAS_PRUEBA]
+    return pd.DataFrame(filas)
+
+
+# ---------------------------------------------------------------- casos adversos
+CASOS_GRAFO = ["aristas eliminadas", "ruido en coordenadas"]  # dependen del grafo: en revisión por el caché
+
+
+def casos_adversos(v: Version) -> pd.DataFrame | None:
+    return _leer_csv(str(v.archivo("casos_adversos.csv")), dtype={"ventana": str})
+
+
+def casos_adversos_md(v: Version) -> str | None:
+    return leer_texto(str(v.archivo("casos_adversos.md")))
+
+
+def resumen_adversos(c: pd.DataFrame) -> pd.DataFrame:
+    """Misma agregación que `src.adversos`: cambio % del MAE frente al caso limpio de la misma ventana y semilla."""
+    base = c[c.caso == "limpio"].set_index(["ventana", "semilla"])[["MAE"]].rename(columns={"MAE": "MAE_limpio"})
+    r = c.join(base, on=["ventana", "semilla"])
+    r["dMAE_pct"] = (r.MAE / r.MAE_limpio - 1) * 100
+    return r.groupby(["caso", "nivel"], sort=False).agg(
+        MAE=("MAE", "mean"), MAE_sd=("MAE", "std"), RMSE=("RMSE", "mean"), R2=("R2", "mean"),
+        cambio_MAE_pct=("dMAE_pct", "mean"), corridas_peor=("dMAE_pct", lambda x: int((x > 0).sum())),
+        n=("MAE", "size")).reset_index()
+
+
+def pandemia(v: Version) -> pd.DataFrame | None:
+    """`pandemia.csv` (cabecera de dos niveles) → modelo, MAE, MAE_sd, RMSE, RMSE_sd, R2, R2_sd."""
+    ruta = v.archivo("pandemia.csv")
+    if not ruta.exists():
+        return None
+    t = pd.read_csv(ruta, header=[0, 1], index_col=0)
+    t.columns = [f"{a}_sd" if b == "std" else a for a, b in t.columns]
+    return t.rename_axis("modelo").reset_index()
+
+
+def metricas_referencias_pandemia(v: Version) -> pd.DataFrame | None:
+    return _leer_csv(str(v.archivo("metricas_referencias_pandemia.csv")), dtype={"ventana": str})
+
+
+def corridas_pandemia(v: Version) -> pd.DataFrame | None:
+    return _leer_csv(str(v.archivo("corridas_neuronales_pandemia.csv")), dtype={"ventana": str})
+
+
+# ---------------------------------------------------------------- mapa de riesgo (despliegue)
+def mapa_riesgo(v: Version) -> pd.DataFrame | None:
+    return _leer_csv(str(v.archivo("mapa_riesgo_distrital.csv")), dtype={"ubigeo": str})
+
+
+GPKG_INEI = RAIZ / "data" / "external" / "inei_distrito_2023" / "DISTRITO.gpkg"

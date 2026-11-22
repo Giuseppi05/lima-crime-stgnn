@@ -16,7 +16,7 @@ import streamlit as st  # noqa: E402
 
 from app import datos as D  # noqa: E402
 from app.componentes import AVISO_CACHE, NOTA_PREDICCIONES  # noqa: E402
-from app.vistas import comparar, datos, desempeno, equidad  # noqa: E402
+from app.vistas import comparar, datos, desempeno, equidad, interpretabilidad  # noqa: E402
 
 st.set_page_config(page_title="Resultados ST-GNN Lima", page_icon="📊", layout="wide")
 
@@ -66,8 +66,7 @@ def main() -> None:
     with pestañas[1]:
         desempeno.mostrar(v)
     with pestañas[2]:
-        en_construccion("Interpretabilidad (OE3)", "atención temporal por desfase, autoatención, Spearman frente a "
-                        "la contigüidad y la conectividad vial, pares de distritos y fidelidad.", True, v)
+        interpretabilidad.mostrar(v)
     with pestañas[3]:
         equidad.mostrar(v)
     with pestañas[4]:
