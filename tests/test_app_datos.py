@@ -253,3 +253,35 @@ def test_mapa_riesgo_coincide_con_predicciones(v2):
     u = g[g.periodo == g.periodo.max()].groupby("ubigeo").predicho.agg(["mean", "std"])
     assert (u["mean"].round(2) - m.predicho).abs().max() < 0.011
     assert (u["std"].round(2) - m.sd).abs().max() < 0.011
+
+
+# ---------------------------------------------------------------- pestaña 7 (Pendientes)
+def test_pendientes_v2(v2):
+    from app.vistas import pendientes
+    filas = {f["Tema"]: f for f in pendientes.items(v2)}
+    assert "Jaccard 0,908" in filas["Solapamiento GE–GC₂ (Jaccard)"]["Detalle"]
+    assert filas["Error de caché del grafo"]["Estado"] == "En revisión"
+    assert filas["Reproducción de la v2 en otra PC"]["Fuente"] == "reproducción local, 21 nov."
+    assert filas["Fig. 1 y Fig. 2"]["Estado"] == "Falta"
+    assert "85,304" in filas["`metricas_referencias.csv` desactualizado"]["Detalle"]
+
+
+def test_numeracion_cubre_todas_las_vistas():
+    """Cada tabla y figura de las vistas tiene número sugerido (desde TABLA III y Fig. 7)."""
+    import ast
+    from app import avc3
+    claves_t, claves_f = set(), set()
+    for f in (RAIZ / "app" / "vistas").glob("*.py"):
+        for n in ast.walk(ast.parse(f.read_text(encoding="utf-8"))):
+            if isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and len(n.args) >= 2                     and isinstance(n.args[1], ast.Constant) and isinstance(n.args[1].value, str):
+                if n.func.id == "tabla":
+                    claves_t.add(n.args[1].value)
+                elif n.func.id in ("figura", "figura_archivo"):
+                    claves_f.add(n.args[1].value)
+            # figuras del repositorio en listas de tuplas ("archivo.png", "clave", "pie")
+            if isinstance(n, ast.Tuple) and len(n.elts) == 3 and all(isinstance(e, ast.Constant) for e in n.elts)                     and str(n.elts[0].value).endswith(".png"):
+                claves_f.add(n.elts[1].value)
+    assert len(claves_t) >= 25 and len(claves_f) >= 14
+    assert not [c for c in claves_t if not avc3.numero_tabla(c)]
+    assert not [c for c in claves_f if not avc3.numero_figura(c)]
+    assert avc3.numero_tabla(avc3.TABLAS[0]) == "III" and avc3.numero_figura(avc3.FIGURAS[0]) == "7"

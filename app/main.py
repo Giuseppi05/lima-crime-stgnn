@@ -16,7 +16,7 @@ import streamlit as st  # noqa: E402
 
 from app import datos as D  # noqa: E402
 from app.componentes import AVISO_CACHE, NOTA_PREDICCIONES  # noqa: E402
-from app.vistas import adversos, comparar, datos, desempeno, equidad, interpretabilidad, mapa  # noqa: E402
+from app.vistas import adversos, comparar, datos, desempeno, equidad, interpretabilidad, mapa, pendientes  # noqa: E402
 
 st.set_page_config(page_title="Resultados ST-GNN Lima", page_icon="📊", layout="wide")
 
@@ -74,7 +74,7 @@ def main() -> None:
     with pestañas[5]:
         mapa.mostrar(v)
     with pestañas[6]:
-        en_construccion("Pendientes del artículo", "lo que el AVC3 promete y falta o está parcial.")
+        pendientes.mostrar(v)
     with pestañas[7]:
         comparar.mostrar(versiones, v)
 

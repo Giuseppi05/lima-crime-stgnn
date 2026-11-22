@@ -85,17 +85,25 @@ CITAS = {
     "reproducible": ("3.2, Despliegue", "Se verificó que el mapa pudiera regenerarse a partir del repositorio"),
 }
 
-# Orden previsto de las tablas y figuras de Resultados (incluye las pestañas aún no construidas para que la
-# numeración sugerida no cambie al agregarlas).
+# Orden de las tablas y figuras en la sección Resultados (OE1 → OE2 → OE3 → OE4 → casos adversos → despliegue).
+# Las de apoyo (pendientes, comparación de versiones) van al final. Una figura «_repo» (la PNG del repositorio) es
+# alternativa de su gráfico y lleva el mismo número.
 TABLAS = [
-    "datos_cobertura", "datos_validacion_grafos", "datos_solapamiento", "modelado_configuracion",
-    "desempeno_global", "desempeno_ventana", "desempeno_semilla", "desempeno_mismo_conjunto",
-    "desempeno_pruebas", "desempeno_r2_distrito", "desempeno_r2_distrito_48",
+    # OE1: datos, grafos y modelado
+    "datos_cobertura", "datos_cobertura_distritos", "datos_calidad", "datos_diccionario", "datos_totales_tabla",
+    "datos_grafos", "datos_validacion_grafos", "datos_solapamiento",
+    "modelado_particion", "modelado_configuracion", "modelado_xgboost",
+    # OE2
+    "desempeno_global", "desempeno_ventana", "desempeno_semilla", "desempeno_mismo_conjunto", "desempeno_pruebas",
+    "desempeno_r2_distrito", "desempeno_r2_distrito_48",
+    # OE3
     "interp_temporal", "interp_spearman", "interp_pares", "interp_fidelidad",
+    # OE4
     "equidad_resumen", "equidad_prueba", "equidad_composicion",
-    "adversos_pandemia", "adversos_perturbaciones",
-    "mapa_riesgo",
-    "comparar_global", "comparar_pruebas",
+    # casos adversos y despliegue
+    "adversos_pandemia", "adversos_perturbaciones", "mapa_riesgo",
+    # apoyo
+    "pendientes", "comparar_global", "comparar_pruebas",
 ]
 FIGURAS = [
     "datos_tendencia", "datos_estacionalidad", "datos_totales", "datos_mapa_grafos",
@@ -112,4 +120,5 @@ def numero_tabla(clave: str) -> str:
 
 
 def numero_figura(clave: str) -> str:
+    clave = clave.removesuffix("_repo")
     return str(7 + FIGURAS.index(clave)) if clave in FIGURAS else ""
