@@ -22,7 +22,7 @@ import torch
 
 from src.comun import ATENCION, FICHAS, PREDICCIONES, PROCESADOS, RESULTADOS, fijar_semilla, guardar_config, leer_config
 from src.modelos import STGNN, atencion_a_tablas
-from src.protocolo import Datos, Transformacion, cargar_datos, indices, metricas, tabla_predicciones, ventanas
+from src.protocolo import H, Datos, Transformacion, cargar_datos, indices, metricas, tabla_predicciones, ventanas
 
 MODELOS = {"GE": "vial", "GC1": None, "GC2": "geo"}
 MODELOS_DIR = RESULTADOS / "modelos"
@@ -44,18 +44,22 @@ def cargar_grafo(tipo: str | None, ubigeos: list[str], matriz: np.ndarray | None
 
 
 def tensor_entrada(d: Datos, tr: Transformacion) -> torch.Tensor:
-    """[meses, distritos, 4]: objetivo transformado, mes seno, mes coseno, pandemia."""
+    """[meses, distritos, F]: objetivo transformado, mes seno, mes coseno, pandemia (+ hurto, robo y otras, si se usan)."""
     z = tr.directa(d.y)
     T, N = z.shape
     s = np.repeat(np.sin(2 * np.pi * d.mes / 12)[:, None], N, 1)
     c = np.repeat(np.cos(2 * np.pi * d.mes / 12)[:, None], N, 1)
     p = np.repeat(d.pandemia[:, None], N, 1)
-    return torch.tensor(np.stack([z, s, c, p], -1), dtype=torch.float32)
+    capas = [z, s, c, p]
+    if d.extra is not None:
+        zx = tr.directa_extra(d.extra)
+        capas += [zx[..., k] for k in range(zx.shape[-1])]
+    return torch.tensor(np.stack(capas, -1), dtype=torch.float32)
 
 
 def ventanas_x(X: torch.Tensor, idx: np.ndarray, L: int) -> torch.Tensor:
-    """Para cada mes objetivo t, los L meses anteriores: solo información previa a t."""
-    return torch.stack([X[t - L:t] for t in idx])
+    """Para cada mes objetivo t, los L meses que terminan en t − H: solo información disponible H meses antes."""
+    return torch.stack([X[t - H - L + 1:t - H + 1] for t in idx])
 
 
 def predecir(modelo, X, idx, L, ei, ea, tr, atencion=False):
@@ -76,7 +80,7 @@ def entrenar_una(d: Datos, v: dict, nombre: str, hp: dict, residual: bool, semil
         X = tensor_entrada(d, tr)
     L = int(hp["entrada_meses"])
     ei, ea = grafo if grafo is not None else cargar_grafo(MODELOS[nombre], d.ubigeos)
-    i_fit = i_tr[i_tr >= L]
+    i_fit = i_tr[i_tr >= L + H - 1]
     Xtr, Ytr = ventanas_x(X, i_fit, L), X[i_fit, :, 0]
     Mtr = torch.tensor(d.valido[i_fit], dtype=torch.float32)  # los meses sin información no entran a la pérdida
     if cfg.get("ponderar_perdida", False):
@@ -85,7 +89,8 @@ def entrenar_una(d: Datos, v: dict, nombre: str, hp: dict, residual: bool, semil
         nivel = np.nanmean(np.where(d.valido[i_tr], d.y[i_tr], np.nan), axis=0)
         peso = nivel * tr.desv
         Mtr = Mtr * torch.tensor(peso / peso.mean(), dtype=torch.float32).view(1, -1)
-    modelo = STGNN(int(hp["oculto"]), float(hp["dropout"]), MODELOS[nombre] is not None, residual, cfg["gat_heads"])
+    modelo = STGNN(int(hp["oculto"]), float(hp["dropout"]), MODELOS[nombre] is not None, residual, cfg["gat_heads"],
+                   rasgos=X.shape[-1])
     opt = torch.optim.Adam(modelo.parameters(), lr=float(hp["lr"]), weight_decay=cfg["weight_decay"])
     huber = torch.nn.HuberLoss(reduction="none")
     gen = torch.Generator().manual_seed(semilla)
@@ -116,7 +121,7 @@ def cargar_entrenado(d: Datos, nombre: str, w: str, semilla: int):
     hp = ck["hp"]
     cfg = leer_config()
     m = STGNN(int(hp["oculto"]), float(hp["dropout"]), MODELOS[nombre] is not None, ck["residual"],
-              cfg["fijos_neuronales"]["gat_heads"])
+              cfg["fijos_neuronales"]["gat_heads"], rasgos=ck.get("rasgos", 4))
     m.load_state_dict(ck["estado"])
     m.eval()
     v = ventanas(incluir_pandemia=True)[w]
@@ -127,7 +132,7 @@ def cargar_entrenado(d: Datos, nombre: str, w: str, semilla: int):
 def predecir_con(modelo, d: Datos, tr, L, i_te, matriz=None, y_entrada=None):
     """Predice la prueba con otro grafo (matriz 43×43) o con otra serie de entrada, sin tocar los pesos."""
     if y_entrada is not None:
-        d = Datos(d.periodos, d.ubigeos, d.distritos, y_entrada, d.valido, d.pandemia, d.mes)
+        d = Datos(d.periodos, d.ubigeos, d.distritos, y_entrada, d.valido, d.pandemia, d.mes, d.extra)
     X = tensor_entrada(d, tr)
     ei, ea = cargar_grafo("x", d.ubigeos, matriz) if modelo.usar_grafo else (None, None)
     p, _ = predecir(modelo, X, i_te, L, ei, ea, tr)
@@ -226,7 +231,8 @@ def _tarea_final(args):
     tabla_predicciones(d, i_te, p_te).to_csv(PREDICCIONES / f"{base}.csv", index=False)
     atencion_a_tablas(extra, d.ubigeos, [d.periodos[t] for t in i_te], L).to_csv(ATENCION / f"{base}.csv", index=False)
     MODELOS_DIR.mkdir(exist_ok=True)
-    torch.save({"estado": modelo.state_dict(), "hp": hp, "residual": residual}, MODELOS_DIR / f"{base}.pt")
+    torch.save({"estado": modelo.state_dict(), "hp": hp, "residual": residual, "rasgos": X.shape[-1]},
+               MODELOS_DIR / f"{base}.pt")
     m = metricas(d.y[i_te][d.valido[i_te]], p_te[d.valido[i_te]])
     return {"modelo": nombre, "ventana": w, "semilla": semilla, "mae_validacion": round(mae_va, 4), "epocas": ep, **m}
 

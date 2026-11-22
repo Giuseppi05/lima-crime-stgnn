@@ -1,0 +1,130 @@
+== h3_base referencias 09:42
+                xgboost       4  45.595  82.295 0.838
+== h3_base ajuste 09:43
+ajuste: 1152 entrenamientos pendientes, 15 procesos
+  100/1152  último: {'ventana': '1', 'modelo': 'GC1', 'salida': 'directa', 'dropout': 0.1, 'entrada_meses': 6, 'lr': 0.0003, 'oculto': 16, 'mae_validacion': 34.781, 'epocas': 41, 'segundos': 5.7}
+  200/1152  último: {'ventana': '1', 'modelo': 'GC2', 'salida': 'directa', 'dropout': 0.1, 'entrada_meses': 6, 'lr': 0.001, 'oculto': 32, 'mae_validacion': 38.7352, 'epocas': 55, 'segundos': 30.1}
+  300/1152  último: {'ventana': '2', 'modelo': 'GE', 'salida': 'directa', 'dropout': 0.1, 'entrada_meses': 6, 'lr': 0.003, 'oculto': 64, 'mae_validacion': 89.8029, 'epocas': 65, 'segundos': 104.1}
+  400/1152  último: {'ventana': '2', 'modelo': 'GC1', 'salida': 'directa', 'dropout': 0.1, 'entrada_meses': 12, 'lr': 0.0003, 'oculto': 16, 'mae_validacion': 109.0804, 'epocas': 31, 'segundos': 6.2}
+  500/1152  último: {'ventana': '2', 'modelo': 'GC2', 'salida': 'directa', 'dropout': 0.1, 'entrada_meses': 12, 'lr': 0.001, 'oculto': 32, 'mae_validacion': 117.1238, 'epocas': 50, 'segundos': 76.0}
+  600/1152  último: {'ventana': '3', 'modelo': 'GE', 'salida': 'directa', 'dropout': 0.1, 'entrada_meses': 12, 'lr': 0.003, 'oculto': 64, 'mae_validacion': 50.834, 'epocas': 56, 'segundos': 214.6}
+  700/1152  último: {'ventana': '3', 'modelo': 'GC1', 'salida': 'directa', 'dropout': 0.3, 'entrada_meses': 6, 'lr': 0.0003, 'oculto': 16, 'mae_validacion': 44.1274, 'epocas': 300, 'segundos': 50.3}
+  800/1152  último: {'ventana': '3', 'modelo': 'GC2', 'salida': 'directa', 'dropout': 0.3, 'entrada_meses': 6, 'lr': 0.001, 'oculto': 32, 'mae_validacion': 52.3959, 'epocas': 69, 'segundos': 73.4}
+  900/1152  último: {'ventana': '4', 'modelo': 'GE', 'salida': 'directa', 'dropout': 0.3, 'entrada_meses': 6, 'lr': 0.003, 'oculto': 64, 'mae_validacion': 50.9174, 'epocas': 34, 'segundos': 81.7}
+  1000/1152  último: {'ventana': '4', 'modelo': 'GC1', 'salida': 'directa', 'dropout': 0.3, 'entrada_meses': 12, 'lr': 0.0003, 'oculto': 16, 'mae_validacion': 47.3925, 'epocas': 41, 'segundos': 12.8}
+  1100/1152  último: {'ventana': '4', 'modelo': 'GC2', 'salida': 'directa', 'dropout': 0.3, 'entrada_meses': 12, 'lr': 0.001, 'oculto': 32, 'mae_validacion': 46.8942, 'epocas': 32, 'segundos': 79.3}
+salida elegida: residual
+== h3_base final 11:26
+modelo ventana                        
+GC1    1        72.992  116.132  0.841
+       2        53.192   84.346  0.926
+       3        49.551   83.045  0.859
+       4        34.953   57.381  0.921
+GC2    1        58.561   93.408  0.900
+       2        53.608   85.668  0.924
+       3        46.177   80.384  0.868
+       4        34.399   55.616  0.926
+GE     1        58.261   93.203  0.901
+       2        53.610   85.641  0.924
+       3        46.276   80.497  0.867
+       4        34.441   55.702  0.926
+== h3_base evaluacion 11:31
+xgboost                    78.457 ± 0.0   136.572 ± 0.0   0.738 ± 0.0    1.783 ± 0.0
+mes_anterior               45.662 ± 0.0    75.818 ± 0.0   0.919 ± 0.0    1.038 ± 0.0
+promedio_movil_3           45.985 ± 0.0    77.112 ± 0.0   0.916 ± 0.0    1.044 ± 0.0
+mismo_mes_anio_anterior    86.808 ± 0.0   140.319 ± 0.0   0.723 ± 0.0    1.969 ± 0.0
+           comparacion   prueba            p GE_supera
+             GE vs GC1 Wilcoxon 1.074208e-06        sí
+             GE vs GC2 Wilcoxon 9.001467e-01        no
+         GE vs xgboost Wilcoxon 2.869501e-08        sí
+    GE vs mes_anterior Wilcoxon 1.223559e-07        no
+     GE_ens vs GC1_ens Wilcoxon 1.153133e-05        sí
+     GE_ens vs GC2_ens Wilcoxon 7.243436e-01        no
+GE_ens vs mes_anterior Wilcoxon 3.520230e-04        no
+== h1_modalidades referencias 11:31
+                xgboost       4  29.365  54.215 0.930
+== h1_modalidades ajuste 11:33
+ajuste: 1152 entrenamientos pendientes, 15 procesos
+  100/1152  último: {'ventana': '1', 'modelo': 'GC1', 'salida': 'directa', 'dropout': 0.1, 'entrada_meses': 6, 'lr': 0.0003, 'oculto': 16, 'mae_validacion': 32.4969, 'epocas': 300, 'segundos': 39.3}
+  200/1152  último: {'ventana': '1', 'modelo': 'GC2', 'salida': 'directa', 'dropout': 0.1, 'entrada_meses': 6, 'lr': 0.001, 'oculto': 32, 'mae_validacion': 34.7087, 'epocas': 82, 'segundos': 51.2}
+  300/1152  último: {'ventana': '2', 'modelo': 'GE', 'salida': 'directa', 'dropout': 0.1, 'entrada_meses': 6, 'lr': 0.003, 'oculto': 64, 'mae_validacion': 69.5379, 'epocas': 77, 'segundos': 128.2}
+  400/1152  último: {'ventana': '2', 'modelo': 'GC1', 'salida': 'directa', 'dropout': 0.1, 'entrada_meses': 12, 'lr': 0.0003, 'oculto': 16, 'mae_validacion': 76.0547, 'epocas': 300, 'segundos': 65.9}
+  500/1152  último: {'ventana': '2', 'modelo': 'GC2', 'salida': 'directa', 'dropout': 0.1, 'entrada_meses': 12, 'lr': 0.001, 'oculto': 32, 'mae_validacion': 87.3207, 'epocas': 104, 'segundos': 168.7}
+  600/1152  último: {'ventana': '3', 'modelo': 'GE', 'salida': 'directa', 'dropout': 0.1, 'entrada_meses': 12, 'lr': 0.003, 'oculto': 64, 'mae_validacion': 51.3613, 'epocas': 112, 'segundos': 479.2}
+  700/1152  último: {'ventana': '3', 'modelo': 'GC1', 'salida': 'directa', 'dropout': 0.3, 'entrada_meses': 6, 'lr': 0.0003, 'oculto': 16, 'mae_validacion': 40.8836, 'epocas': 186, 'segundos': 31.7}
+  800/1152  último: {'ventana': '3', 'modelo': 'GC2', 'salida': 'directa', 'dropout': 0.3, 'entrada_meses': 6, 'lr': 0.001, 'oculto': 32, 'mae_validacion': 53.2315, 'epocas': 50, 'segundos': 51.9}
+  900/1152  último: {'ventana': '4', 'modelo': 'GE', 'salida': 'directa', 'dropout': 0.3, 'entrada_meses': 6, 'lr': 0.003, 'oculto': 64, 'mae_validacion': 48.177, 'epocas': 38, 'segundos': 92.7}
+  1000/1152  último: {'ventana': '4', 'modelo': 'GC1', 'salida': 'directa', 'dropout': 0.3, 'entrada_meses': 12, 'lr': 0.0003, 'oculto': 16, 'mae_validacion': 42.1076, 'epocas': 41, 'segundos': 12.1}
+  1100/1152  último: {'ventana': '4', 'modelo': 'GC2', 'salida': 'directa', 'dropout': 0.3, 'entrada_meses': 12, 'lr': 0.001, 'oculto': 32, 'mae_validacion': 47.3694, 'epocas': 31, 'segundos': 76.1}
+salida elegida: residual
+== h1_modalidades final 13:19
+modelo ventana                       
+GC1    1        39.140  64.365  0.953
+       2        39.212  63.727  0.958
+       3        30.729  51.156  0.946
+       4        25.888  41.354  0.959
+GC2    1        38.468  62.512  0.955
+       2        39.396  64.064  0.958
+       3        30.030  48.871  0.951
+       4        25.969  40.573  0.961
+GE     1        38.558  62.577  0.955
+       2        39.703  64.287  0.957
+       3        31.089  50.455  0.947
+       4        25.975  40.594  0.961
+== h1_modalidades evaluacion 13:24
+xgboost                    56.186 ± 0.0   100.499 ± 0.0    0.858 ± 0.0    1.792 ± 0.0
+mes_anterior               31.271 ± 0.0     51.76 ± 0.0    0.962 ± 0.0    0.997 ± 0.0
+promedio_movil_3            34.05 ± 0.0    56.397 ± 0.0    0.955 ± 0.0    1.086 ± 0.0
+mismo_mes_anio_anterior    86.808 ± 0.0   140.319 ± 0.0    0.723 ± 0.0    2.766 ± 0.0
+           comparacion   prueba            p GE_supera
+             GE vs GC1 Wilcoxon 9.952329e-01        no
+             GE vs GC2 Wilcoxon 1.630114e-05        no
+         GE vs xgboost Wilcoxon 1.236706e-05        sí
+    GE vs mes_anterior Wilcoxon 1.977469e-09        no
+     GE_ens vs GC1_ens Wilcoxon 1.337828e-01        no
+     GE_ens vs GC2_ens Wilcoxon 3.285233e-01        no
+GE_ens vs mes_anterior Wilcoxon 8.337743e-07        no
+== h3_modalidades referencias 13:25
+                xgboost       4  44.102  80.575 0.845
+== h3_modalidades ajuste 13:26
+ajuste: 1152 entrenamientos pendientes, 15 procesos
+  100/1152  último: {'ventana': '1', 'modelo': 'GC1', 'salida': 'directa', 'dropout': 0.1, 'entrada_meses': 6, 'lr': 0.0003, 'oculto': 16, 'mae_validacion': 40.0244, 'epocas': 104, 'segundos': 13.6}
+  200/1152  último: {'ventana': '1', 'modelo': 'GC2', 'salida': 'directa', 'dropout': 0.1, 'entrada_meses': 6, 'lr': 0.001, 'oculto': 32, 'mae_validacion': 37.9102, 'epocas': 44, 'segundos': 25.9}
+  300/1152  último: {'ventana': '2', 'modelo': 'GE', 'salida': 'directa', 'dropout': 0.1, 'entrada_meses': 6, 'lr': 0.003, 'oculto': 64, 'mae_validacion': 94.5845, 'epocas': 63, 'segundos': 100.6}
+  400/1152  último: {'ventana': '2', 'modelo': 'GC1', 'salida': 'directa', 'dropout': 0.1, 'entrada_meses': 12, 'lr': 0.0003, 'oculto': 16, 'mae_validacion': 120.4656, 'epocas': 110, 'segundos': 21.9}
+  500/1152  último: {'ventana': '2', 'modelo': 'GC2', 'salida': 'directa', 'dropout': 0.1, 'entrada_meses': 12, 'lr': 0.001, 'oculto': 32, 'mae_validacion': 118.8803, 'epocas': 49, 'segundos': 82.8}
+  600/1152  último: {'ventana': '3', 'modelo': 'GE', 'salida': 'directa', 'dropout': 0.1, 'entrada_meses': 12, 'lr': 0.003, 'oculto': 64, 'mae_validacion': 64.1918, 'epocas': 77, 'segundos': 298.6}
+  700/1152  último: {'ventana': '3', 'modelo': 'GC1', 'salida': 'directa', 'dropout': 0.3, 'entrada_meses': 6, 'lr': 0.0003, 'oculto': 16, 'mae_validacion': 45.6563, 'epocas': 300, 'segundos': 50.0}
+  800/1152  último: {'ventana': '3', 'modelo': 'GC2', 'salida': 'directa', 'dropout': 0.3, 'entrada_meses': 6, 'lr': 0.001, 'oculto': 32, 'mae_validacion': 53.6504, 'epocas': 65, 'segundos': 63.9}
+  900/1152  último: {'ventana': '4', 'modelo': 'GE', 'salida': 'directa', 'dropout': 0.3, 'entrada_meses': 6, 'lr': 0.003, 'oculto': 64, 'mae_validacion': 51.3631, 'epocas': 32, 'segundos': 72.7}
+  1000/1152  último: {'ventana': '4', 'modelo': 'GC1', 'salida': 'directa', 'dropout': 0.3, 'entrada_meses': 12, 'lr': 0.0003, 'oculto': 16, 'mae_validacion': 44.1891, 'epocas': 40, 'segundos': 11.8}
+  1100/1152  último: {'ventana': '4', 'modelo': 'GC2', 'salida': 'directa', 'dropout': 0.3, 'entrada_meses': 12, 'lr': 0.001, 'oculto': 32, 'mae_validacion': 47.5815, 'epocas': 31, 'segundos': 76.6}
+salida elegida: residual
+== h3_modalidades final 14:46
+modelo ventana                       
+GC1    1        61.670  98.278  0.889
+       2        54.120  86.128  0.923
+       3        49.080  82.831  0.860
+       4        34.733  56.661  0.923
+GC2    1        60.481  95.973  0.895
+       2        53.169  84.651  0.926
+       3        48.567  82.810  0.859
+       4        36.241  58.361  0.919
+GE     1        60.410  95.951  0.895
+       2        53.168  84.646  0.926
+       3        51.082  86.634  0.846
+       4        36.260  58.513  0.918
+== h3_modalidades evaluacion 14:50
+xgboost                    79.029 ± 0.0   137.796 ± 0.0    0.733 ± 0.0    1.798 ± 0.0
+mes_anterior               45.662 ± 0.0    75.818 ± 0.0    0.919 ± 0.0    1.038 ± 0.0
+promedio_movil_3           45.985 ± 0.0    77.112 ± 0.0    0.916 ± 0.0    1.044 ± 0.0
+mismo_mes_anio_anterior    86.808 ± 0.0   140.319 ± 0.0    0.723 ± 0.0    1.969 ± 0.0
+           comparacion   prueba            p GE_supera
+             GE vs GC1 Wilcoxon 5.945396e-01        no
+             GE vs GC2 Wilcoxon 2.419867e-06        no
+         GE vs xgboost Wilcoxon 1.486846e-07        sí
+    GE vs mes_anterior Wilcoxon 1.977469e-09        no
+     GE_ens vs GC1_ens Wilcoxon 8.624274e-01        no
+     GE_ens vs GC2_ens Wilcoxon 1.622065e-06        no
+GE_ens vs mes_anterior Wilcoxon 4.414801e-08        no
+== FIN 14:51

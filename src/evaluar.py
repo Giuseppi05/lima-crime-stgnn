@@ -12,15 +12,20 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
-from src.comun import FICHAS, PREDICCIONES
-from src.protocolo import cargar_datos, indices, ventanas
+from src.comun import FICHAS, PREDICCIONES, leer_config
+from src.protocolo import H, cargar_datos, indices, ventanas
 
 ALFA = 0.05
 NEURONALES = ["GE", "GC1", "GC2"]
-ORDEN = ["GE", "GC2", "GC1", "xgboost", "mes_anterior", "promedio_movil_3", "mismo_mes_anio_anterior"]
+ORDEN = ["GE", "GC2", "GC1", "GE_ens", "GC2_ens", "GC1_ens", "xgboost", "mes_anterior", "promedio_movil_3",
+         "mismo_mes_anio_anterior"]
 NOMBRES = {"GE": "GE (ST-GNN vial)", "GC2": "GC₂ (ST-GNN geográfica)", "GC1": "GC₁ (GRU sin grafo)",
            "xgboost": "XGBoost", "mes_anterior": "Mes anterior", "promedio_movil_3": "Promedio móvil 3 meses",
            "mismo_mes_anio_anterior": "Mismo mes del año anterior"}
+if H > 1:  # con horizonte H la referencia de persistencia es el último mes observado, no el mes anterior
+    NOMBRES["mes_anterior"] = f"Último mes observado (t − {H})"
+NOMBRES.update({f"{m}_ens": f"{NOMBRES[m]}, promedio de semillas" for m in NEURONALES})
+ENSAMBLE = bool(leer_config().get("ensamble_semillas", False))
 PLAYA = ["SANTA MARIA DEL MAR", "PUNTA NEGRA", "SAN BARTOLO", "PUCUSANA", "PUNTA HERMOSA"]
 
 
@@ -34,6 +39,11 @@ def cargar_predicciones(ventanas_ok=("1", "2", "3", "4")) -> pd.DataFrame:
         t = pd.read_csv(f, dtype={"ubigeo": str})
         filas.append(t.assign(modelo=m.group(1), ventana=m.group(2), semilla=int(m.group(3))))
     p = pd.concat(filas, ignore_index=True)
+    if ENSAMBLE:
+        # opción extra: una sola predicción por modelo, el promedio de sus 5 semillas
+        ens = (p[p.modelo.isin(NEURONALES)].groupby(["modelo", "ventana", "ubigeo", "periodo"], as_index=False)
+               .agg(real=("real", "first"), predicho=("predicho", "mean"), valido=("valido", "first")))
+        p = pd.concat([p, ens.assign(modelo=ens.modelo + "_ens", semilla=0)], ignore_index=True)
     return p[p["valido"]].copy()
 
 
@@ -47,9 +57,9 @@ def escala_mase(d, vs) -> dict:
     """MASE: denominador = MAE del 'mes anterior' dentro del entrenamiento de cada ventana (todos los distritos)."""
     esc = {}
     for w, v in vs.items():
-        i = indices(d, v["entrenamiento"])[1:]
-        ok = d.valido[i] & d.valido[i - 1]
-        esc[w] = np.abs(d.y[i] - d.y[i - 1])[ok].mean()
+        i = indices(d, v["entrenamiento"])[H:]
+        ok = d.valido[i] & d.valido[i - H]
+        esc[w] = np.abs(d.y[i] - d.y[i - H])[ok].mean()
     return esc
 
 
@@ -125,18 +135,22 @@ def main() -> None:
     piv_mae = dmed.pivot(index="ubigeo", columns="modelo", values="MAE")
     piv_rmse = dmed.pivot(index="ubigeo", columns="modelo", values="RMSE")
     filas = []
-    for rival, tipo in [("GC1", "AVC3"), ("GC2", "AVC3"), ("xgboost", "complementaria"), ("mes_anterior", "complementaria")]:
-        if rival not in piv_mae or "GE" not in piv_mae:
+    pares = [("GE", "GC1", "AVC3"), ("GE", "GC2", "AVC3"), ("GE", "xgboost", "complementaria"),
+             ("GE", "mes_anterior", "complementaria")]
+    if ENSAMBLE:
+        pares += [("GE_ens", "GC1_ens", "extra"), ("GE_ens", "GC2_ens", "extra"), ("GE_ens", "mes_anterior", "extra")]
+    for a_, rival, tipo in pares:
+        if rival not in piv_mae or a_ not in piv_mae:
             continue
-        c = comparar(piv_mae["GE"].values, piv_mae[rival].values)
-        c_r = comparar(piv_rmse["GE"].values, piv_rmse[rival].values)
-        mae_ok = g_ms.loc["GE", "MAE"] < g_ms.loc[rival, "MAE"]
-        rmse_ok = g_ms.loc["GE", "RMSE"] < g_ms.loc[rival, "RMSE"]
+        c = comparar(piv_mae[a_].values, piv_mae[rival].values)
+        c_r = comparar(piv_rmse[a_].values, piv_rmse[rival].values)
+        mae_ok = g_ms.loc[a_, "MAE"] < g_ms.loc[rival, "MAE"]
+        rmse_ok = g_ms.loc[a_, "RMSE"] < g_ms.loc[rival, "RMSE"]
         exito = mae_ok and rmse_ok and c["p"] < ALFA
-        filas.append({"comparacion": f"GE vs {rival}", "tipo": tipo, "MAE_GE": g_ms.loc["GE", "MAE"],
-                      f"MAE_rival": g_ms.loc[rival, "MAE"], "RMSE_GE": g_ms.loc["GE", "RMSE"],
+        filas.append({"comparacion": f"{a_} vs {rival}", "tipo": tipo, "MAE_GE": g_ms.loc[a_, "MAE"],
+                      f"MAE_rival": g_ms.loc[rival, "MAE"], "RMSE_GE": g_ms.loc[a_, "RMSE"],
                       "RMSE_rival": g_ms.loc[rival, "RMSE"], **c, "p_RMSE_distrito": c_r["p"],
-                      "menor_MAE_por_distrito": "GE" if c["media_dif"] < 0 else rival,
+                      "menor_MAE_por_distrito": a_ if c["media_dif"] < 0 else rival,
                       "prueba_RMSE": c_r["prueba"], "GE_supera": "sí" if exito else "no"})
     est = pd.DataFrame(filas)
     est.to_csv(FICHAS / "pruebas_estadisticas.csv", index=False)

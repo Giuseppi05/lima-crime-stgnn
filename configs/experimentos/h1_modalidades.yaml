@@ -1,0 +1,224 @@
+entrada_meses: 12
+fijos_neuronales:
+  criterio_parada: MAE de validacion en denuncias
+  epocas_max: 300
+  gat_heads: 2
+  optimizador: Adam
+  paciencia: 30
+  perdida: Huber
+  tam_lote: 8
+  weight_decay: 0.0001
+fijos_xgboost:
+  colsample_bytree: 1.0
+  early_stopping_rounds: 50
+  n_estimators_max: 2000
+  reg_lambda: 1.0
+grilla_neuronal:
+  dropout:
+  - 0.1
+  - 0.3
+  entrada_meses:
+  - 6
+  - 12
+  lr:
+  - 0.0001
+  - 0.0003
+  - 0.001
+  - 0.003
+  oculto:
+  - 16
+  - 32
+  - 64
+grilla_xgboost:
+  learning_rate:
+  - 0.01
+  - 0.03
+  - 0.1
+  max_depth:
+  - 2
+  - 3
+  - 5
+  - 7
+  min_child_weight:
+  - 1
+  - 5
+  subsample:
+  - 0.8
+  - 1.0
+horizonte_meses: 1
+semillas:
+- 0
+- 1
+- 2
+- 3
+- 4
+transformacion: log1p + estandarizacion por distrito con media y desviacion solo de
+  entrenamiento
+ventana_pandemia:
+  P:
+    entrenamiento:
+    - 2018-01
+    - 2019-09
+    prueba:
+    - 2020-04
+    - 2021-03
+    validacion:
+    - 2019-10
+    - 2020-03
+ventanas:
+  '1':
+    entrenamiento:
+    - 2018-01
+    - 2021-09
+    prueba:
+    - 2022-10
+    - 2023-09
+    validacion:
+    - 2021-10
+    - 2022-09
+  '2':
+    entrenamiento:
+    - 2018-01
+    - 2022-09
+    prueba:
+    - 2023-10
+    - 2024-09
+    validacion:
+    - 2022-10
+    - 2023-09
+  '3':
+    entrenamiento:
+    - 2018-01
+    - 2023-09
+    prueba:
+    - 2024-10
+    - 2025-09
+    validacion:
+    - 2023-10
+    - 2024-09
+  '4':
+    entrenamiento:
+    - 2018-01
+    - 2024-09
+    prueba:
+    - 2025-10
+    - 2026-09
+    validacion:
+    - 2024-10
+    - 2025-09
+version:
+  actual: h1_modalidades
+  h1_modalidades: 'opcion extra fuera del AVC3: horizonte 1 con hurto, robo y otras
+    modalidades como entradas; eleccion solo con validacion'
+entradas_modalidades: true
+ensamble_semillas: true
+hiperparametros:
+  xgboost:
+    '1':
+      learning_rate: 0.1
+      max_depth: 2
+      min_child_weight: 5
+      subsample: 0.8
+      n_arboles: 55
+      mae_validacion: 31.1597
+    '2':
+      learning_rate: 0.01
+      max_depth: 2
+      min_child_weight: 5
+      subsample: 1.0
+      n_arboles: 1786
+      mae_validacion: 70.6948
+    '3':
+      learning_rate: 0.1
+      max_depth: 2
+      min_child_weight: 5
+      subsample: 0.8
+      n_arboles: 135
+      mae_validacion: 39.037
+    '4':
+      learning_rate: 0.03
+      max_depth: 2
+      min_child_weight: 1
+      subsample: 0.8
+      n_arboles: 75
+      mae_validacion: 27.0627
+  GC1:
+    '1':
+      oculto: 16
+      lr: 0.003
+      dropout: 0.1
+      entrada_meses: 6
+      mae_validacion: 25.242
+    '2':
+      oculto: 64
+      lr: 0.0001
+      dropout: 0.3
+      entrada_meses: 6
+      mae_validacion: 32.9116
+    '3':
+      oculto: 64
+      lr: 0.003
+      dropout: 0.3
+      entrada_meses: 6
+      mae_validacion: 35.4453
+    '4':
+      oculto: 64
+      lr: 0.003
+      dropout: 0.1
+      entrada_meses: 12
+      mae_validacion: 24.9839
+  GC2:
+    '1':
+      oculto: 64
+      lr: 0.0001
+      dropout: 0.1
+      entrada_meses: 6
+      mae_validacion: 25.428
+    '2':
+      oculto: 64
+      lr: 0.0001
+      dropout: 0.1
+      entrada_meses: 12
+      mae_validacion: 32.9688
+    '3':
+      oculto: 64
+      lr: 0.003
+      dropout: 0.1
+      entrada_meses: 6
+      mae_validacion: 37.0838
+    '4':
+      oculto: 32
+      lr: 0.001
+      dropout: 0.3
+      entrada_meses: 12
+      mae_validacion: 25.5883
+  GE:
+    '1':
+      oculto: 64
+      lr: 0.0001
+      dropout: 0.1
+      entrada_meses: 6
+      mae_validacion: 25.4495
+    '2':
+      oculto: 64
+      lr: 0.001
+      dropout: 0.1
+      entrada_meses: 12
+      mae_validacion: 32.9495
+    '3':
+      oculto: 64
+      lr: 0.003
+      dropout: 0.1
+      entrada_meses: 6
+      mae_validacion: 36.9673
+    '4':
+      oculto: 32
+      lr: 0.001
+      dropout: 0.3
+      entrada_meses: 12
+      mae_validacion: 25.5871
+salida_neuronal:
+  elegida: residual
+  mae_validacion_promedio:
+    directa: 45.6112
+    residual: 30.0504

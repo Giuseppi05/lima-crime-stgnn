@@ -12,20 +12,23 @@ import torch
 from torch import nn
 from torch_geometric.nn import GATConv
 
+from src.protocolo import H
+
 N_RASGOS = 4  # objetivo transformado, mes seno, mes coseno, pandemia
 
 
 class STGNN(nn.Module):
-    def __init__(self, oculto: int, dropout: float, usar_grafo: bool, residual: bool, heads: int = 2):
+    def __init__(self, oculto: int, dropout: float, usar_grafo: bool, residual: bool, heads: int = 2,
+                 rasgos: int = N_RASGOS):
         super().__init__()
         self.usar_grafo = usar_grafo
         self.residual = residual
         if usar_grafo:
             # concat=False promedia las cabezas: la salida tiene 'oculto' dimensiones, igual que en GC₁
-            self.espacial = GATConv(N_RASGOS, oculto, heads=heads, concat=False, edge_dim=1,
+            self.espacial = GATConv(rasgos, oculto, heads=heads, concat=False, edge_dim=1,
                                     add_self_loops=True, fill_value="mean")
         else:
-            self.espacial = nn.Linear(N_RASGOS, oculto)
+            self.espacial = nn.Linear(rasgos, oculto)
         self.drop = nn.Dropout(dropout)
         self.gru = nn.GRU(oculto, oculto, batch_first=True)
         # atención aditiva (Bahdanau): consulta = último estado oculto, claves = todos los estados
@@ -36,13 +39,17 @@ class STGNN(nn.Module):
         self._cache = {}
 
     def _lote_grafo(self, edge_index, edge_attr, n_grafos, n_nodos):
-        clave = (n_grafos, n_nodos, edge_index.data_ptr())
-        if clave not in self._cache:
+        # La caché guarda los tensores originales y los compara por identidad. Antes la clave era
+        # edge_index.data_ptr(): si llegaba otro grafo (aristas eliminadas, ruido en coordenadas) y PyTorch
+        # reutilizaba esa memoria, se usaba el grafo anterior. Al retener los originales su memoria no se reutiliza.
+        c = self._cache
+        if not (c and c["edge_index"] is edge_index and c["edge_attr"] is edge_attr
+                and c["forma"] == (n_grafos, n_nodos)):
             desp = (torch.arange(n_grafos) * n_nodos).view(1, -1, 1)
             ei = (edge_index.unsqueeze(1) + desp).reshape(2, -1)
             ea = edge_attr.repeat(n_grafos, 1)
-            self._cache = {clave: (ei, ea)}
-        return self._cache[clave]
+            self._cache = {"edge_index": edge_index, "edge_attr": edge_attr, "forma": (n_grafos, n_nodos), "lote": (ei, ea)}
+        return self._cache["lote"]
 
     def forward(self, x, edge_index=None, edge_attr=None, atencion=False):
         """x: [B, L, N, F] → ŷ: [B, N] en escala transformada."""
@@ -61,7 +68,7 @@ class STGNN(nn.Module):
         contexto = (beta * estados).sum(1)
         y = self.salida(self.drop(contexto)).view(B, N)
         if self.residual:
-            y = y + x[:, -1, :, 0]  # predice el cambio respecto del último mes observado
+            y = y + x[:, -1, :, 0]  # predice el cambio respecto del último mes observado (t − H)
         if not atencion:
             return y
         extra = {"temporal": beta.view(B, N, L)}
@@ -78,13 +85,13 @@ def atencion_a_tablas(extra, ubigeos, periodos_objetivo, L) -> pd.DataFrame:
     B, N, _ = beta.shape
     b, n, l = np.meshgrid(np.arange(B), np.arange(N), np.arange(L), indexing="ij")
     filas.append(pd.DataFrame({
-        "tipo": "temporal", "periodo": np.array(periodos_objetivo)[b.ravel()], "desfase": (L - l).ravel(),
+        "tipo": "temporal", "periodo": np.array(periodos_objetivo)[b.ravel()], "desfase": (L - l + H - 1).ravel(),
         "origen": ub[n.ravel()], "destino": ub[n.ravel()], "peso": beta.ravel().round(6)}))
     if "espacial" in extra:
         ei, a, B, L_, N = extra["espacial"]
         ei = ei.numpy()
         g = ei[1] // N
         filas.append(pd.DataFrame({
-            "tipo": "espacial", "periodo": np.array(periodos_objetivo)[g // L_], "desfase": L_ - g % L_,
+            "tipo": "espacial", "periodo": np.array(periodos_objetivo)[g // L_], "desfase": L_ - g % L_ + H - 1,
             "origen": ub[ei[0] % N], "destino": ub[ei[1] % N], "peso": a.detach().numpy().round(6)}))
     return pd.concat(filas, ignore_index=True)
