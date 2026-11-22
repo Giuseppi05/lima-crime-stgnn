@@ -39,13 +39,17 @@ class STGNN(nn.Module):
         self._cache = {}
 
     def _lote_grafo(self, edge_index, edge_attr, n_grafos, n_nodos):
-        clave = (n_grafos, n_nodos, edge_index.data_ptr())
-        if clave not in self._cache:
+        # La caché guarda los tensores originales y los compara por identidad. Antes la clave era
+        # edge_index.data_ptr(): si llegaba otro grafo (aristas eliminadas, ruido en coordenadas) y PyTorch
+        # reutilizaba esa memoria, se usaba el grafo anterior. Al retener los originales su memoria no se reutiliza.
+        c = self._cache
+        if not (c and c["edge_index"] is edge_index and c["edge_attr"] is edge_attr
+                and c["forma"] == (n_grafos, n_nodos)):
             desp = (torch.arange(n_grafos) * n_nodos).view(1, -1, 1)
             ei = (edge_index.unsqueeze(1) + desp).reshape(2, -1)
             ea = edge_attr.repeat(n_grafos, 1)
-            self._cache = {clave: (ei, ea)}
-        return self._cache[clave]
+            self._cache = {"edge_index": edge_index, "edge_attr": edge_attr, "forma": (n_grafos, n_nodos), "lote": (ei, ea)}
+        return self._cache["lote"]
 
     def forward(self, x, edge_index=None, edge_attr=None, atencion=False):
         """x: [B, L, N, F] → ŷ: [B, N] en escala transformada."""
