@@ -16,7 +16,7 @@ import streamlit as st  # noqa: E402
 
 from app import datos as D  # noqa: E402
 from app.componentes import AVISO_CACHE, NOTA_PREDICCIONES  # noqa: E402
-from app.vistas import comparar, desempeno, equidad  # noqa: E402
+from app.vistas import comparar, datos, desempeno, equidad  # noqa: E402
 
 st.set_page_config(page_title="Resultados ST-GNN Lima", page_icon="📊", layout="wide")
 
@@ -62,9 +62,7 @@ def main() -> None:
     pestañas = st.tabs(["1 · Datos (OE1)", "2 · Desempeño (OE2)", "3 · Interpretabilidad (OE3)", "4 · Equidad (OE4)",
                         "5 · Casos adversos", "6 · Mapa de riesgo", "7 · Pendientes", "Comparar versiones"])
     with pestañas[0]:
-        en_construccion("Datos (OE1): comprensión y preparación",
-                        "cobertura del panel, totales y duplicados, tendencia y estacionalidad, validación de grafos, "
-                        "solapamiento GE–GC₂ con Jaccard, mapa de nodos y aristas y configuración elegida (Modelado).")
+        datos.mostrar(v)
     with pestañas[1]:
         desempeno.mostrar(v)
     with pestañas[2]:

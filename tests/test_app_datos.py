@@ -165,3 +165,42 @@ def test_citas_literales_del_avc3():
     texto = " ".join(p.text for p in Document(str(AVC3)).paragraphs)
     for clave, (_, cita) in CITAS.items():
         assert cita in texto, clave
+
+
+# ---------------------------------------------------------------- pestaña 1 (Datos, OE1)
+def test_solapamiento_ge_gc2():
+    """Dato verificado: 89 aristas comunes, 9 solo geográficas, 0 solo viales, Jaccard 0,908."""
+    s = D.solapamiento(D.aristas("geo"), D.aristas("vial"))
+    assert (s["comunes"], s["solo_geo"], s["solo_vial"], s["union"]) == (89, 9, 0, 98)
+    assert F.num(s["jaccard"]) == "0,908"
+
+
+def test_validacion_grafos_coincide_con_ficha(v2):
+    nod = D.nodos()
+    ub = list(nod.ubigeo)
+    rg, rv = D.resumen_grafo(D.aristas("geo"), ub), D.resumen_grafo(D.aristas("vial"), ub)
+    assert (rg["aristas"], rv["aristas"]) == (98, 89) and rg["conectado"] and rv["conectado"]
+    g = D.tabla_md(D.validacion_grafos_md(v2), "Grafos")
+    assert list(g["Aristas"]) == ["98", "89"]
+    assert list(g["Grado medio"]) == [f"{rg['grado_medio']:.2f}", f"{rv['grado_medio']:.2f}"]
+    d = D.distancia_red_vs_recta(nod)
+    assert d["pares"] == 903 and d["violaciones"] == 0
+    assert f"{d['cociente_min']:.3f}" == "1.038" and f"{d['cociente_mediana']:.3f}" == "1.215"
+
+
+def test_cobertura_coincide_con_calidad(v2):
+    p = D.panel()
+    c = D.cobertura(p).set_index("estado").celdas
+    assert (c["observado"], c["cero"], c["sin_informacion"]) == (4446, 60, 9)
+    assert "observado 4446, cero 60, sin_informacion 9" in D.calidad_md(v2)
+    assert len(p) == 43 * 105 and not p.duplicated(["ubigeo", "periodo"]).any()
+    assert F.entero(p.objetivo.sum()) == "957 705"
+
+
+def test_configuracion_es_la_de_validacion(v2):
+    cfg, aj = D.configuracion(v2), D.ajuste_hiperparametros(v2)
+    ver = D.verificar_configuracion(cfg, aj, cfg["salida_neuronal"]["elegida"])
+    assert len(ver) == 15 and ver.coincide.all()
+    prom = D.eleccion_salida_desde_ajuste(aj)
+    esperado = cfg["salida_neuronal"]["mae_validacion_promedio"]
+    assert round(prom["residual"], 4) == esperado["residual"] and round(prom["directa"], 4) == esperado["directa"]
