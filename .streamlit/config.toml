@@ -1,0 +1,6 @@
+# Interfaz de resultados (app/): tema claro, igual al fondo blanco de las figuras del artículo.
+[theme]
+base = "light"
+
+[browser]
+gatherUsageStats = false
