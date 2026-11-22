@@ -225,3 +225,20 @@ def test_autoatencion_y_fidelidad_coinciden_con_ficha(v2):
     f = D.atencion_fidelidad(v2)
     assert f"ΔMAE top {f.dMAE_top.mean():.3f}; ΔMAE azar {f.dMAE_azar.mean():.3f}" in md
     assert f"{int((f.dMAE_top > f.dMAE_azar).sum())} de 20" in md
+
+
+# ---------------------------------------------------------------- pestaña 5 (Casos adversos)
+def test_pandemia_v2(v2):
+    pa = D.pandemia(v2)
+    assert len(pa) == 7 and {"MAE", "MAE_sd", "RMSE", "R2"} <= set(pa.columns)
+    c = D.corridas_pandemia(v2)
+    ge = pa.set_index("modelo").loc[D.NOMBRES["GE"]]
+    assert round(c[c.modelo == "GE"].MAE.mean(), 3) == ge.MAE
+
+
+def test_resumen_adversos_coincide_con_ficha(v2):
+    r = D.resumen_adversos(D.casos_adversos(v2))
+    tm = D.tablas_md(D.casos_adversos_md(v2))[0][1]
+    assert [f"{x:.3f}" for x in r.MAE] == [f"{float(x):.3f}" for x in tm["MAE"]]
+    assert list(r.corridas_peor) == [int(x) for x in tm["corridas_peor"]]
+    assert set(D.CASOS_GRAFO) <= set(r.caso)

@@ -16,7 +16,7 @@ import streamlit as st  # noqa: E402
 
 from app import datos as D  # noqa: E402
 from app.componentes import AVISO_CACHE, NOTA_PREDICCIONES  # noqa: E402
-from app.vistas import comparar, datos, desempeno, equidad, interpretabilidad  # noqa: E402
+from app.vistas import adversos, comparar, datos, desempeno, equidad, interpretabilidad  # noqa: E402
 
 st.set_page_config(page_title="Resultados ST-GNN Lima", page_icon="📊", layout="wide")
 
@@ -70,7 +70,7 @@ def main() -> None:
     with pestañas[3]:
         equidad.mostrar(v)
     with pestañas[4]:
-        en_construccion("Casos adversos", "pandemia (ventana P) y perturbaciones del grafo y de los datos.", True, v)
+        adversos.mostrar(v)
     with pestañas[5]:
         en_construccion("Mapa de riesgo (Despliegue)", "predicho, desviación entre semillas, real y error por "
                         "distrito.")
