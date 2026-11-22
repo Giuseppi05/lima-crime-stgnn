@@ -1,7 +1,10 @@
 modelo,prueba,estadistico,p,significativa
-GE (ST-GNN vial),Kruskal-Wallis,25.204500151011757,3.3644364748432275e-06,sí
-GC₂ (ST-GNN geográfica),Kruskal-Wallis,25.400664451827225,3.050112063424266e-06,sí
-GC₁ (GRU sin grafo),Kruskal-Wallis,24.638508003624253,4.464943481600463e-06,sí
+GE (ST-GNN vial),Kruskal-Wallis,24.821624886741176,4.074296584913763e-06,sí
+GC₂ (ST-GNN geográfica),Kruskal-Wallis,25.017849592268192,3.6935415293695262e-06,sí
+GC₁ (GRU sin grafo),Kruskal-Wallis,26.380217456961645,1.8689968245904372e-06,sí
+"GE (ST-GNN vial), promedio de semillas",Kruskal-Wallis,24.64041075203866,4.460697669533735e-06,sí
+"GC₂ (ST-GNN geográfica), promedio de semillas",Kruskal-Wallis,24.92724252491695,3.86472023617338e-06,sí
+"GC₁ (GRU sin grafo), promedio de semillas",Kruskal-Wallis,26.282996073693766,1.9620944921447712e-06,sí
 XGBoost,Kruskal-Wallis,19.58187858652974,5.5956313191377086e-05,sí
 Mes anterior,Kruskal-Wallis,25.11026880096648,3.526747850476714e-06,sí
 Promedio móvil 3 meses,Kruskal-Wallis,20.505255209906352,3.526471725873991e-05,sí

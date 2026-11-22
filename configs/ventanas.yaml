@@ -1,112 +1,118 @@
-semillas:
-- 0
-- 1
-- 2
-- 3
-- 4
-horizonte_meses: 1
 entrada_meses: 12
-ventanas:
-  '1':
-    entrenamiento:
-    - 2018-01
-    - 2021-09
-    validacion:
-    - 2021-10
-    - 2022-09
-    prueba:
-    - 2022-10
-    - 2023-09
-  '2':
-    entrenamiento:
-    - 2018-01
-    - 2022-09
-    validacion:
-    - 2022-10
-    - 2023-09
-    prueba:
-    - 2023-10
-    - 2024-09
-  '3':
-    entrenamiento:
-    - 2018-01
-    - 2023-09
-    validacion:
-    - 2023-10
-    - 2024-09
-    prueba:
-    - 2024-10
-    - 2025-09
-  '4':
-    entrenamiento:
-    - 2018-01
-    - 2024-09
-    validacion:
-    - 2024-10
-    - 2025-09
-    prueba:
-    - 2025-10
-    - 2026-09
-ventana_pandemia:
-  P:
-    entrenamiento:
-    - 2018-01
-    - 2019-09
-    validacion:
-    - 2019-10
-    - 2020-03
-    prueba:
-    - 2020-04
-    - 2021-03
-transformacion: log1p + estandarizacion por distrito con media y desviacion solo de
-  entrenamiento
 fijos_neuronales:
-  optimizador: Adam
-  weight_decay: 0.0001
-  perdida: Huber
-  epocas_max: 300
-  paciencia: 30
   criterio_parada: MAE de validacion en denuncias
+  epocas_max: 300
   gat_heads: 2
+  optimizador: Adam
+  paciencia: 30
+  perdida: Huber
   tam_lote: 8
-  ponderar_perdida: true
+  weight_decay: 0.0001
+fijos_xgboost:
+  colsample_bytree: 1.0
+  early_stopping_rounds: 50
+  n_estimators_max: 2000
+  reg_lambda: 1.0
 grilla_neuronal:
-  oculto:
-  - 16
-  - 32
-  - 64
-  lr:
-  - 0.0001
-  - 0.0003
-  - 0.001
-  - 0.003
   dropout:
   - 0.1
   - 0.3
   entrada_meses:
   - 6
   - 12
+  lr:
+  - 0.0001
+  - 0.0003
+  - 0.001
+  - 0.003
+  oculto:
+  - 16
+  - 32
+  - 64
 grilla_xgboost:
+  learning_rate:
+  - 0.01
+  - 0.03
+  - 0.1
   max_depth:
   - 2
   - 3
   - 5
   - 7
-  learning_rate:
-  - 0.01
-  - 0.03
-  - 0.1
-  subsample:
-  - 0.8
-  - 1.0
   min_child_weight:
   - 1
   - 5
-fijos_xgboost:
-  n_estimators_max: 2000
-  early_stopping_rounds: 50
-  colsample_bytree: 1.0
-  reg_lambda: 1.0
+  subsample:
+  - 0.8
+  - 1.0
+horizonte_meses: 1
+semillas:
+- 0
+- 1
+- 2
+- 3
+- 4
+transformacion: log1p + estandarizacion por distrito con media y desviacion solo de
+  entrenamiento
+ventana_pandemia:
+  P:
+    entrenamiento:
+    - 2018-01
+    - 2019-09
+    prueba:
+    - 2020-04
+    - 2021-03
+    validacion:
+    - 2019-10
+    - 2020-03
+ventanas:
+  '1':
+    entrenamiento:
+    - 2018-01
+    - 2021-09
+    prueba:
+    - 2022-10
+    - 2023-09
+    validacion:
+    - 2021-10
+    - 2022-09
+  '2':
+    entrenamiento:
+    - 2018-01
+    - 2022-09
+    prueba:
+    - 2023-10
+    - 2024-09
+    validacion:
+    - 2022-10
+    - 2023-09
+  '3':
+    entrenamiento:
+    - 2018-01
+    - 2023-09
+    prueba:
+    - 2024-10
+    - 2025-09
+    validacion:
+    - 2023-10
+    - 2024-09
+  '4':
+    entrenamiento:
+    - 2018-01
+    - 2024-09
+    prueba:
+    - 2025-10
+    - 2026-09
+    validacion:
+    - 2024-10
+    - 2025-09
+entradas_modalidades: false
+ensamble_semillas: true
+salida_neuronal:
+  elegida: residual
+  mae_validacion_promedio:
+    directa: 44.4067
+    residual: 30.7242
 hiperparametros:
   xgboost:
     '1':
@@ -146,108 +152,124 @@ hiperparametros:
       mae_validacion: 42.0405
   GC1:
     '1':
-      oculto: 64
-      lr: 0.003
+      oculto: 32
+      lr: 0.001
       dropout: 0.3
       entrada_meses: 6
-      mae_validacion: 24.5029
+      mae_validacion: 25.228
+      mae_validacion_multianual: 25.228
     '2':
       oculto: 64
       lr: 0.0001
       dropout: 0.3
-      entrada_meses: 12
-      mae_validacion: 32.9755
+      entrada_meses: 6
+      mae_validacion: 33.0091
+      mae_validacion_multianual: 29.139
     '3':
       oculto: 64
-      lr: 0.003
+      lr: 0.0001
       dropout: 0.1
       entrada_meses: 6
-      mae_validacion: 35.6803
+      mae_validacion: 38.4017
+      mae_validacion_multianual: 32.2266
     '4':
+      oculto: 32
+      lr: 0.001
+      dropout: 0.3
+      entrada_meses: 12
+      mae_validacion: 25.5071
+      mae_validacion_multianual: 30.6868
+    P:
       oculto: 64
       lr: 0.003
       dropout: 0.1
-      entrada_meses: 12
-      mae_validacion: 25.335
-    P:
-      oculto: 32
-      lr: 0.001
-      dropout: 0.1
       entrada_meses: 6
-      mae_validacion: 37.281
+      mae_validacion: 37.5448
   GC2:
     '1':
       oculto: 16
-      lr: 0.0001
+      lr: 0.001
       dropout: 0.3
       entrada_meses: 6
-      mae_validacion: 25.4673
+      mae_validacion: 25.4486
+      mae_validacion_multianual: 25.4486
     '2':
       oculto: 32
       lr: 0.003
-      dropout: 0.3
+      dropout: 0.1
       entrada_meses: 12
-      mae_validacion: 33.1145
+      mae_validacion: 33.2231
+      mae_validacion_multianual: 29.3462
     '3':
-      oculto: 64
+      oculto: 32
       lr: 0.003
       dropout: 0.1
       entrada_meses: 12
-      mae_validacion: 38.3412
+      mae_validacion: 38.388
+      mae_validacion_multianual: 32.3601
     '4':
-      oculto: 64
-      lr: 0.0001
+      oculto: 32
+      lr: 0.003
       dropout: 0.1
       entrada_meses: 12
-      mae_validacion: 25.9105
+      mae_validacion: 26.3336
+      mae_validacion_multianual: 30.8535
     P:
       oculto: 16
       lr: 0.003
       dropout: 0.1
       entrada_meses: 6
-      mae_validacion: 37.8115
+      mae_validacion: 37.9944
   GE:
     '1':
       oculto: 16
-      lr: 0.0001
+      lr: 0.001
       dropout: 0.3
       entrada_meses: 6
-      mae_validacion: 25.4773
+      mae_validacion: 25.4576
+      mae_validacion_multianual: 25.4576
     '2':
       oculto: 32
       lr: 0.003
-      dropout: 0.3
+      dropout: 0.1
       entrada_meses: 12
-      mae_validacion: 33.0946
+      mae_validacion: 33.1951
+      mae_validacion_multianual: 29.4016
     '3':
-      oculto: 64
+      oculto: 32
       lr: 0.003
       dropout: 0.1
       entrada_meses: 12
-      mae_validacion: 38.3377
+      mae_validacion: 38.3929
+      mae_validacion_multianual: 32.3987
     '4':
-      oculto: 64
-      lr: 0.0001
+      oculto: 16
+      lr: 0.003
       dropout: 0.1
       entrada_meses: 12
-      mae_validacion: 25.9105
+      mae_validacion: 26.1059
+      mae_validacion_multianual: 30.8653
     P:
       oculto: 16
       lr: 0.003
       dropout: 0.1
       entrada_meses: 6
-      mae_validacion: 37.8214
-salida_neuronal:
-  elegida: residual
-  mae_validacion_promedio:
-    directa: 43.5453
-    residual: 30.3456
+      mae_validacion: 37.9925
+seleccion: multianual
+correccion_cache_grafo: true
 version:
-  actual: v3
+  actual: v4
   v1: grilla de partida (lr 1e-3 y 3e-3; XGBoost 24 combinaciones), tag git v1-resultados
   v2: 'grilla ampliada solo con lr 1e-4 y 3e-4 (48 combinaciones) y XGBoost a 48;
     motivo: en v1 el mejor MAE de validacion llego en las epocas 1-4 (mediana 4 con
     salida residual). Eleccion solo con validacion.'
-  v3: grilla de v2 y perdida Huber ponderada por distrito (nivel medio de entrenamiento
+  v3: 'grilla de v2 y perdida Huber ponderada por distrito (nivel medio de entrenamiento
     x desviacion del log), para alinear el entrenamiento con el MAE en denuncias;
-    misma ponderacion para GE, GC1 y GC2; eleccion solo con validacion.
+    misma ponderacion para GE, GC1 y GC2; eleccion solo con validacion. NO ADOPTADA:
+    empeora el MAE de validacion (GE 30,681 -> 30,846); resultados en results/v3/.'
+  v4: 'grilla de la v2 (sin perdida ponderada); los hiperparametros de la ventana
+    w se eligen con el MAE de validacion promedio de las ventanas 1..w (seleccion:
+    multianual); la ventana 1 y la P como en la v2. Adoptada por una confirmacion
+    fuera de muestra dentro de la validacion (9 de 10 pares). Desarrollo en results/experimentos/h1_v4_validacion_multianual/
+    (lectura.md); entrenada en la PC de la v2 el 2026-11-22, con la atencion y los
+    casos adversos recalculados tras corregir la cache del grafo.'

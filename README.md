@@ -9,7 +9,18 @@ Artefacto de investigación: **no está pensado para decisiones operativas de pa
 | Rama | Contenido |
 | --- | --- |
 | `main` | Versión estable v2: las seis fases de CRISP-DM con resultados completos (grilla ampliada, configuración elegida solo con validación). Resultados de la v1 en `results/v1/`. |
-| `dev` | Desarrollo sobre la v2: diagnóstico de dependencia espacial y versión 3 (pérdida ponderada por volumen). Resultados de la v3 en `results/fichas/` y `results/v3/`; comparación en `results/fichas/comparacion_v1_v2_v3.md`. |
+| `dev` | **v4, la versión del artículo**: `configs/ventanas.yaml` y `results/` son la v4. Incluye además el diagnóstico espacial, la corrección de la caché del grafo, los experimentos fuera del AVC3 (`results/experimentos/`) y la interfaz de resultados (`app/`). |
+
+### Versiones
+
+| Versión | Cambio | ¿Adoptada? | Resumen |
+| --- | --- | --- | --- |
+| v1 | grilla de partida | reemplazada | `results/v1/` (tag `v1-resultados`) |
+| v2 | grilla ampliada con lr 1e-4 y 3e-4 | reemplazada | `results/v2/` y el experimento `h1_base` |
+| v3 | pérdida Huber ponderada por distrito | no: empeora el MAE de validación | `results/v3/`; comparación en `results/fichas/comparacion_v1_v2_v3.md` |
+| v4 | los hiperparámetros de la ventana w se eligen con el MAE de validación promedio de las ventanas 1…w (`seleccion: multianual`) | **sí**: confirmación fuera de muestra dentro de la validación | `results/v4/`, `results/fichas/`; desarrollo y lectura en `results/experimentos/h1_v4_validacion_multianual/` |
+
+La v4 se entrenó en dos PCs con el mismo resultado: las 60 corridas pararon en la misma época y el MAE del GE es 32,139 en las dos. La atención y los casos adversos de la v4 se calcularon con la caché del grafo corregida (`correccion_cache_grafo: true`); los de la v1 a la v3 tenían ese error. Falta regenerar el mapa de riesgo de la v4 (`python -m src.mapa`, necesita los límites del INEI).
 
 ## Entorno
 
@@ -39,6 +50,19 @@ python -m venv .venv
 | Despliegue | `python -m src.mapa` | `results/figuras/mapa_riesgo_distrital.png` |
 
 Cada script acepta `--rapido` (1 ventana, 1 semilla, pocas épocas) solo para comprobar que el código corre; sus salidas van a `results_rapido/` y no se usan en el artículo.
+
+La v4 no entrena grilla nueva: usa la de la v2 (`results/fichas/ajuste_hiperparametros_v4.csv`). Para reproducirla bastan `python -m src.entrenar --fase final` y `--pandemia` (unos 5 min con 14 procesos), y después la evaluación. Un experimento se corre igual con `GNN_EXPERIMENTO=<nombre>`, que lee `configs/experimentos/<nombre>.yaml` y escribe en `results/experimentos/<nombre>/`.
+
+Pruebas: `python -m tests.test_cache_grafo`, `python -m tests.test_seleccion_multianual`, `python -m tests.test_adversos_detalle`; las de la interfaz, con `python -m pytest tests/test_app_datos.py`.
+
+## Interfaz de resultados
+
+```bash
+.venv/Scripts/python -m pip install -r requirements-app.txt
+.venv/Scripts/python -m streamlit run app/main.py
+```
+
+Solo lee `results/` y `data/processed/`: muestra lo que pide la sección Resultados del AVC3 y exporta tablas y figuras con la numeración del artículo.
 
 ## Estructura
 
