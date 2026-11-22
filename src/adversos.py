@@ -77,6 +77,37 @@ def cambio_pesos(ruido, A) -> pd.DataFrame:
                           "cambio_abs_max_peso": float(np.abs(W - A)[m].max())} for (s, k), W in ruido.items()])
 
 
+def _coma(x: float, nd: int) -> str:
+    return f"{x:.{nd}f}".replace(".", ",")
+
+
+def detalle_grafo(r: pd.DataFrame, cp: pd.DataFrame) -> str:
+    """Párrafo con 4 decimales para los casos de grafo, cuyo cambio redondea a 0 con 3 decimales.
+
+    `r` tiene una fila por corrida y caso, con `MAE`, `MAE_limpio` y `dMAE_%`; `cp` es la salida de `cambio_pesos`.
+    Los sorteos repetidos (mismo MAE exacto con aristas distintas) eran la huella del error de caché del grafo.
+    """
+    limpio = r[r.caso == "limpio"].MAE.mean()
+    ru = r[r.caso == "ruido en coordenadas"]
+    partes = [f"**Casos de grafo, con 4 decimales.** MAE limpio {_coma(limpio, 4)}"]
+    if len(ru):
+        por_nivel = ru.groupby("nivel", sort=False).MAE.mean()
+        partes[0] += "; " + "; ".join(f"con {n}, {_coma(x, 4)}" for n, x in por_nivel.items()) + "."
+        pesos = cp.groupby("sigma_m").cambio_abs_medio_peso.mean()
+        partes.append(
+            f"Ruido en coordenadas: el cambio del MAE es < 0,01 % en {int((ru['dMAE_%'].abs() < 0.01).sum())} de "
+            f"{len(ru)} corridas (máximo en valor absoluto {_coma(ru['dMAE_%'].abs().max(), 4)} %), y "
+            f"{int((ru.MAE == ru.MAE_limpio).sum())} dieron un MAE idéntico al limpio. Cambio absoluto medio de los "
+            "pesos: " + "; ".join(f"{_coma(x, 4)} con σ = {s} m" for s, x in pesos.items()) + ".")
+    ar = r[r.caso == "aristas eliminadas"]
+    if len(ar):
+        rep = ar.groupby(["nivel", "ventana", "semilla"], sort=False).MAE.agg(lambda x: x.nunique() < len(x))
+        rep = rep.groupby(level="nivel", sort=False).agg(["sum", "size"])
+        partes.append("Aristas eliminadas: corridas con dos sorteos o más de igual MAE, " + "; ".join(
+            f"{n}: {int(t['sum'])} de {int(t['size'])}" for n, t in rep.iterrows()) + ".")
+    return " ".join(partes) + "\n"
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--rapido", action="store_true")
@@ -128,6 +159,7 @@ def main() -> None:
           res.round(3).to_markdown(), "",
           "`cambio_MAE_pct`: cambio porcentual medio del MAE frente al mismo modelo con datos limpios. "
           "`corridas_peor`: casos en que el MAE subió.\n",
+          detalle_grafo(r, cp),
           "### Cambio en los pesos del grafo vial por el ruido en coordenadas\n",
           "Los tramos que cruzan dependen de los límites y no del centroide, así que el ruido solo cambia la distancia por "
           "red y, con ella, el peso; el conjunto de aristas no cambia.\n",
