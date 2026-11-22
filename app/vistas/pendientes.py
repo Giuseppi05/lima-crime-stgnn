@@ -1,7 +1,7 @@
 """Pestaña 7. Pendientes del artículo: lo que el AVC3 promete y falta, está parcial o pide una decisión.
 
 Cada estado se comprueba contra los archivos al abrir la pestaña (no es una lista fija), salvo el hallazgo de la
-reproducción en otra PC, que no está en results/ y se muestra solo como texto con su fuente.
+reproducción en otra PC, que no está en un archivo de métricas y se muestra solo como texto con su fuente.
 """
 from __future__ import annotations
 
@@ -13,6 +13,25 @@ from app import formato as F
 from app.componentes import tabla
 
 FUENTE_REPRO = "reproducción local, 21 nov."
+FUENTE_REPRO_V4 = "nota del 22 nov. en lectura.md de la v4"
+_REPRO_V2 = ["Al reentrenar la v2 en otra PC, **59 de 60** corridas salieron iguales.",
+             "Una sola (**GE, ventana 3, semilla 1**) paró en otra época por ruido de punto flotante entre máquinas.",
+             "Con eso, el p de **GE vs GC₂** pasa de **0,009** a **0,134**.",
+             "El GE sigue sin superar a nadie, pero esa comparación es frágil y hay que decidir cómo mencionarlo."]
+_REPRO_V4 = ["La v4 se entrenó en la PC de Josué y se reentrenó en la PC de la v2: las **60 de 60** corridas pararon en "
+             "la misma época.",
+             "56 dan el mismo MAE de prueba y las otras 4 difieren en menos de 0,00003; las predicciones cambian como "
+             "mucho 0,005 denuncias.",
+             "El MAE del GE es **32,139** en las dos PCs y el p de **GE vs GC₂** es **0,019** en las dos. La diferencia "
+             "GE–GC₂ es de 0,023 denuncias y con el promedio de semillas no es significativa (p = 0,611)."]
+
+
+def es_v4(v: D.Version) -> bool:
+    return v.clave in ("v4", "exp:h1_v4_validacion_multianual")
+
+
+def reproduccion(v: D.Version) -> tuple[str, list[str]]:
+    return (FUENTE_REPRO_V4, _REPRO_V4) if es_v4(v) else (FUENTE_REPRO, _REPRO_V2)
 
 
 def _fila(tema, promesa, estado, detalle, fuente):
@@ -126,19 +145,41 @@ def items(v: D.Version) -> list[dict]:
                            "atencion_spearman.csv"))
 
     # 11. Mapa reproducible
-    filas.append(_fila("Mapa reproducible", "3.2 Despliegue: «se verificó que el mapa pudiera regenerarse»",
-                       "No verificable aquí",
-                       "La interfaz no ejecuta `src.mapa`; comprueba que el CSV coincide con las predicciones. "
-                       + ("Los límites del INEI no están en esta PC." if not D.GPKG_INEI.exists() else
-                          "Los límites del INEI están en esta PC."), "mapa_riesgo_distrital.csv"))
+    inei = ("Los límites del INEI no están en esta PC." if not D.GPKG_INEI.exists() else
+            "Los límites del INEI están en esta PC.")
+    if D.mapa_riesgo(v) is None:
+        filas.append(_fila("Mapa reproducible", "3.2 Despliegue: mapa de riesgo distrital", "Falta",
+                           "No hay `mapa_riesgo_distrital.csv` para esta versión: correr `python -m src.mapa` en la PC "
+                           "con `data/external/inei_distrito_2023/DISTRITO.gpkg`. " + inei, "mapa_riesgo_distrital.csv"))
+    else:
+        filas.append(_fila("Mapa reproducible", "3.2 Despliegue: «se verificó que el mapa pudiera regenerarse»",
+                           "No verificable aquí",
+                           "La interfaz no ejecuta `src.mapa`; comprueba que el CSV coincide con las predicciones. "
+                           + inei, "mapa_riesgo_distrital.csv"))
 
-    # 12. Reproducción en otra PC (solo texto)
-    filas.append(_fila("Reproducción de la v2 en otra PC", "3.1 Validez y repositorio reproducible",
-                       "Decisión del equipo",
-                       "59 de 60 corridas salieron iguales. Una sola (GE, ventana 3, semilla 1) paró en otra época por "
-                       "ruido de punto flotante entre máquinas. Con eso, el p de GE vs GC₂ pasa de 0,009 a 0,134. El "
-                       "GE sigue sin superar a nadie, pero esa comparación es frágil: decidir cómo mencionarlo. Cifras "
-                       "fuera de results/ (no se cargan desde archivos).", FUENTE_REPRO))
+    # 12. Selección multianual: la Metodología del AVC3 no la describe
+    if D.multianual(D.configuracion(v)):
+        filas.append(_fila("Selección multianual de hiperparámetros", "3.2 Modelado: «elegidos solo con validación»",
+                           "Redacción",
+                           "La configuración de la ventana w se eligió con el MAE de validación promedio de las ventanas "
+                           "1…w, no solo con el de w. Agregar a la Metodología la frase propuesta en `lectura.md` "
+                           "(sección 4) del experimento h1_v4_validacion_multianual.", "ventanas.yaml (seleccion)"))
+
+    # 13. Fidelidad de la atención
+    fi = D.atencion_fidelidad(v)
+    if fi is not None and not D.aviso_cache_grafo(v):
+        filas.append(_fila("Fidelidad de la atención", "3.2 Evaluación (OE3): «indicio, no causa»", "Redacción",
+                           f"Al quitar el 10 % de las aristas con más atención, el ΔMAE medio es "
+                           f"{F.num(fi.dMAE_top.mean())}, frente a {F.num(fi.dMAE_azar.mean())} al quitarlas al azar; "
+                           f"dañó más que el azar en {int((fi.dMAE_top > fi.dMAE_azar).sum())} de {len(fi)} corridas "
+                           "(prueba en `atencion.md`). Si no es significativo, presentar la atención solo como "
+                           "descripción.", "atencion_fidelidad.csv, atencion.md"))
+
+    # 14. Reproducción en otra PC (solo texto)
+    fuente, texto = reproduccion(v)
+    filas.append(_fila("Reproducción en otra PC", "3.1 Validez y repositorio reproducible",
+                       "Cubierto" if es_v4(v) else "Decisión del equipo", " ".join(t.replace("**", "") for t in texto),
+                       fuente))
     return filas
 
 
@@ -152,17 +193,14 @@ def mostrar(v: D.Version) -> None:
     t.insert(0, "N.º", [str(i + 1) for i in range(len(t))])
     resumen = t.Estado.value_counts()
     st.caption(" · ".join(f"{e}: {n}" for e, n in resumen.items()))
+    fuente, texto = reproduccion(v)
     tabla(t, "pendientes", "Pendientes del artículo frente a lo que promete el AVC3", altura=520,
           nota="Nota. Elaboración propia. Estado comprobado contra los archivos del repositorio, salvo la reproducción "
-               f"en otra PC ({FUENTE_REPRO}).")
+               f"en otra PC ({fuente}).")
 
     st.subheader("Hallazgo de la reproducción")
-    st.markdown(f"""Fuente: **{FUENTE_REPRO}** (estas cifras no están en `results/` de esta rama).
-
-- Al reentrenar la v2 en otra PC, **59 de 60** corridas salieron iguales.
-- Una sola (**GE, ventana 3, semilla 1**) paró en otra época por ruido de punto flotante entre máquinas.
-- Con eso, el p de **GE vs GC₂** pasa de **0,009** a **0,134**.
-- El GE sigue sin superar a nadie, pero esa comparación es frágil y hay que decidir cómo mencionarlo.""")
+    st.markdown(f"Fuente: **{fuente}** (estas cifras no se cargan de un archivo de métricas).\n\n"
+                + "\n".join(f"- {t}" for t in texto))
     p = D.pruebas_estadisticas(v)
     if p is not None and "GE vs GC2" in set(p.comparacion):
         pv = p.set_index("comparacion").loc["GE vs GC2", "p"]

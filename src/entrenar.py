@@ -202,9 +202,12 @@ def fase_congelar(vs):
     if cfg.get("seleccion", "un_anio") == "multianual" and "P" not in vs:
         # v4 (candidato 3b): la configuración de la ventana w se elige con el MAE de validación promedio de las ventanas
         # 1 … w (todos esos años son anteriores a la prueba de w). La ventana 1 queda igual; P no pasa por aquí.
+        orden = sorted(vs)
+        todas = sorted(ventanas())
+        if orden != todas:  # con menos ventanas elegiría con menos años sin avisar
+            raise ValueError(f"seleccion: multianual necesita las ventanas {todas} juntas; recibió {orden}")
         clave = ["modelo", "salida", "oculto", "lr", "dropout", "entrada_meses"]
         piv = a.pivot_table(index=clave, columns="ventana", values="mae_validacion")
-        orden = sorted(vs)
         a = pd.concat([a[a.ventana == w].merge(piv[orden[:k + 1]].mean(1).rename("mae_multianual").reset_index(), on=clave)
                        for k, w in enumerate(orden)], ignore_index=True)
         mejor = a.loc[a.groupby(["ventana", "modelo", "salida"]).mae_multianual.idxmin()]
