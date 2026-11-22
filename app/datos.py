@@ -118,10 +118,24 @@ def detectar_versiones(results: Path = RESULTS) -> list[Version]:
     return vs
 
 
+def yamls_de(v: Version) -> list[Path]:
+    """Yaml de la versión: el de configs (artículo o experimento) y cualquier *.yaml dentro de su carpeta."""
+    out = [v.yaml] if v.yaml is not None and v.yaml.exists() else []
+    carpetas = {v.fichas} | ({v.fichas.parent} if v.fichas.parent != RESULTS else set())
+    for c in carpetas:
+        out += sorted(c.glob("*.yaml"))
+    return out
+
+
+def correccion_cache_grafo(v: Version) -> bool:
+    """True si el yaml de la versión declara `correccion_cache_grafo: true` (la clave la agrega el equipo cuando
+    la atención y los casos adversos se recalculen con la corrección de fix/cache-grafo)."""
+    return any(leer_yaml(str(y)).get("correccion_cache_grafo") is True for y in yamls_de(v))
+
+
 def aviso_cache_grafo(v: Version) -> bool:
-    """True mientras la versión no tenga la corrección del caché del grafo (v2.1 o mayor)."""
-    n = v.numero()
-    return n is None or n < (2, 1)
+    """El aviso va en todas las versiones hasta que su yaml tenga `correccion_cache_grafo: true`."""
+    return not correccion_cache_grafo(v)
 
 
 # ---------------------------------------------------------------- lectores genéricos

@@ -115,11 +115,16 @@ def test_brecha_y_composicion(v2):
     assert c.n.sum() == 43 and list(c.sector) == D.SECTORES
 
 
-def test_aviso_cache():
-    assert D.numero_version("v2.1") == (2, 1)
-    v = D.Version(clave="v2.1", etiqueta="", fichas=RAIZ)
-    assert not D.aviso_cache_grafo(v)
-    assert D.aviso_cache_grafo(D.Version(clave="v2", etiqueta="", fichas=RAIZ))
+def test_aviso_cache(v2, tmp_path):
+    # sin la clave en el yaml, el aviso va en todas las versiones actuales
+    assert all(D.aviso_cache_grafo(v) for v in D.detectar_versiones())
+    (tmp_path / "fichas").mkdir()
+    (tmp_path / "fichas" / "version.yaml").write_text("correccion_cache_grafo: true\n", encoding="utf-8")
+    corregida = D.Version(clave="exp:h1_base", etiqueta="", fichas=tmp_path / "fichas")
+    assert not D.aviso_cache_grafo(corregida)
+    (tmp_path / "fichas" / "version.yaml").write_text("correccion_cache_grafo: false\n", encoding="utf-8")
+    sin_correccion = D.Version(clave="exp:otra", etiqueta="", fichas=tmp_path / "fichas")
+    assert D.aviso_cache_grafo(sin_correccion)
 
 
 def test_formato():

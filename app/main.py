@@ -33,7 +33,11 @@ def barra_lateral(versiones: list[D.Version]) -> D.Version:
                         f"- Figuras: `{rel(v.figuras)}`")
     st.sidebar.caption(f"`version.actual` en configs/ventanas.yaml: **{D.version_actual()}**")
     if D.aviso_cache_grafo(v):
-        st.sidebar.caption("Corrección del caché del grafo: pendiente (llega en v2.1).")
+        st.sidebar.caption("Corrección del caché del grafo: pendiente (rama fix/cache-grafo; la atención y los "
+                           "casos adversos se recalcularán como el experimento h1_base). El aviso se apaga con "
+                           "`correccion_cache_grafo: true` en el yaml de la versión.")
+    else:
+        st.sidebar.caption("Corrección del caché del grafo: declarada en el yaml de la versión.")
     if st.sidebar.button("Recargar archivos"):
         st.cache_data.clear()
         st.rerun()

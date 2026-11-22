@@ -243,46 +243,69 @@ def _real_predicho(v, pred):
 
 
 # ---------------------------------------------------------------- R² por distrito
+NOTA_R2 = ("**Por qué sale negativo:** el R² de un distrito compara su error con la variación de ese mismo distrito "
+           "dentro de los 12 meses de cada ventana. Esa variación es pequeña frente al error de un mes a otro, así que "
+           "errar unas decenas de denuncias basta para que el R² sea menor que 0; al mes anterior le pasa lo mismo. "
+           "**Por qué el global es alto:** el R² global usa los 43 distritos juntos, y la diferencia de nivel entre "
+           "distritos es enorme (de 1 a 1 687 denuncias por celda observada, según `calidad.md`); acertar el nivel de "
+           "cada distrito ya explica casi toda esa varianza.")
+
+
 def _r2_distrito(v, pred):
     st.subheader("R² por distrito")
     cita("ficha_metricas")
     if pred is None:
         pendiente(f"no hay carpeta `predicciones/` para {v.etiqueta}; el R² por distrito no existe como archivo")
         return
-    modo = st.radio("Definición", ["ventana", "48"], horizontal=True, key="r2_modo",
-                    format_func=lambda m: "Por ventana (12 meses) y promedio — como el MAE por distrito"
-                    if m == "ventana" else "Alternativa: 48 meses juntos")
-    r = D.r2_por_distrito(pred, modo)
-    if modo == "ventana":
-        calculado("R² de cada distrito en los 12 meses de cada ventana y semilla; promedio de las 4 ventanas; "
-                  "media ± desviación entre semillas. Es la misma agregación que `metricas_por_distrito.csv`.")
-    else:
-        calculado("R² de cada distrito con los 48 meses de prueba juntos, por semilla; media ± desviación entre "
-                  "semillas. El cambio de nivel entre ventanas aumenta la varianza total y suele inflar este R².")
     nod = D.nodos()
     nombres = dict(zip(nod.ubigeo, nod.distrito)) if nod is not None else {}
-    modelos = _orden(r.modelo)
+    r = D.r2_por_distrito(pred, "ventana")
+    calculado("R² de cada distrito en los 12 meses de cada ventana y semilla; promedio de las 4 ventanas; media ± "
+              "desviación entre semillas (la misma agregación que `metricas_por_distrito.csv`).")
+    st.markdown(NOTA_R2)
+
+    modelos = [m for m in _orden(r.modelo) if m != "mes_anterior"]
+    m = st.selectbox("Modelo (siempre junto al mes anterior)", modelos, format_func=_nombre, key="r2_mod")
     piv_m = r.pivot(index="ubigeo", columns="modelo", values="R2")
     piv_s = r.pivot(index="ubigeo", columns="modelo", values="R2_sd")
-    orden_u = sorted(piv_m.index, key=lambda u: nombres.get(u, u))
-    t = pd.DataFrame({"Distrito": [nombres.get(u, u) for u in orden_u]})
-    for m in modelos:
-        t[_nombre(m)] = [F.ms(piv_m.loc[u, m], piv_s.loc[u, m]) for u in orden_u]
-    tabla(t, "desempeno_r2_distrito", "R² en prueba por distrito y modelo", altura=380,
-          nota="Nota. Elaboración propia. Calculado desde las predicciones válidas de las ventanas 1–4.")
-    neg = r[r.R2 < 0]
-    if len(neg):
-        st.caption(f"R² negativo (el modelo erra más que la media del propio distrito): {len(neg)} pares "
-                   f"distrito-modelo, en {neg.ubigeo.nunique()} distritos.")
+    orden_u = list(piv_m[m].sort_values(ascending=False).index)
+    t = pd.DataFrame({"Distrito": [nombres.get(u, u) for u in orden_u],
+                      _nombre(m): [F.ms(piv_m.loc[u, m], piv_s.loc[u, m]) for u in orden_u],
+                      "Mes anterior": [F.num(piv_m.loc[u, "mes_anterior"]) for u in orden_u]})
+    med = r.groupby("modelo").R2.median()
+    neg = r[r.R2 < 0].groupby("modelo").size()
+    st.caption(f"Mediana entre distritos: {_nombre(m)} {F.num(med[m])} (R² < 0 en {neg.get(m, 0)} de 43); "
+               f"mes anterior {F.num(med['mes_anterior'])} (R² < 0 en {neg.get('mes_anterior', 0)} de 43).")
+    tabla(t, "desempeno_r2_distrito", f"R² en prueba por distrito: {_nombre(m)} y mes anterior", altura=380,
+          nota="Nota. Elaboración propia. Calculado desde las predicciones válidas de las ventanas 1–4: R² por ventana "
+               "(12 meses) y promedio de las 4 ventanas; media ± desviación entre semillas.")
 
-    m = st.selectbox("Modelo para el gráfico", modelos, format_func=_nombre, key="r2_mod")
-    s = r[r.modelo == m].assign(distrito=lambda x: x.ubigeo.map(nombres)).sort_values("R2")
-    sd = s.R2_sd.where(s.R2_sd > 0)
-    fig = go.Figure(go.Bar(x=s.R2, y=s.distrito, orientation="h", marker_color=COLOR_MODELO.get(m),
-                           error_x=dict(type="data", array=sd, visible=True, thickness=1, width=2),
-                           hovertemplate="%{y}: %{x:.3f}<extra></extra>"))
-    layout(fig, alto=900, xaxis_title="R²", showlegend=False)
+    s = pd.DataFrame({"ubigeo": orden_u[::-1]})
+    s["distrito"] = s.ubigeo.map(nombres)
+    fig = go.Figure()
+    for clave, nombre in [(m, _nombre(m)), ("mes_anterior", "Mes anterior")]:
+        sd = piv_s.loc[s.ubigeo, clave].where(piv_s.loc[s.ubigeo, clave] > 0)
+        fig.add_trace(go.Bar(x=piv_m.loc[s.ubigeo, clave], y=s.distrito, orientation="h", name=nombre,
+                             marker_color=COLOR_MODELO.get(clave), marker_line=dict(color="white", width=1),
+                             error_x=dict(type="data", array=sd, visible=True, thickness=1, width=2),
+                             hovertemplate=f"{nombre}<br>%{{y}}: %{{x:.3f}}<extra></extra>"))
+    layout(fig, alto=1000, xaxis_title="R² (por ventana, promedio de las 4)", barmode="group", bargap=0.25)
     fig.update_yaxes(tickfont=dict(size=10))
-    figura(fig, "desempeno_r2_distrito", f"R² en prueba por distrito, {_nombre(m)}"
-                                         f"{' (promedio de ventanas)' if modo == 'ventana' else ' (48 meses)'}.",
-           alto_export=900)
+    figura(fig, "desempeno_r2_distrito", f"R² en prueba por distrito, {_nombre(m)} y mes anterior (R² por ventana, "
+                                         f"promedio de las 4 ventanas).", alto_export=1000)
+
+    with st.expander("Alternativa: R² con los 48 meses juntos (todos los modelos)"):
+        r48 = D.r2_por_distrito(pred, "48")
+        calculado("R² de cada distrito con los 48 meses de prueba juntos, por semilla; media ± desviación entre "
+                  "semillas. El cambio de nivel entre ventanas aumenta la varianza total del distrito y eleva este R².")
+        m48 = r48.pivot(index="ubigeo", columns="modelo", values="R2")
+        s48 = r48.pivot(index="ubigeo", columns="modelo", values="R2_sd")
+        orden48 = sorted(m48.index, key=lambda u: nombres.get(u, u))
+        t48 = pd.DataFrame({"Distrito": [nombres.get(u, u) for u in orden48]})
+        for mm in _orden(r48.modelo):
+            t48[_nombre(mm)] = [F.ms(m48.loc[u, mm], s48.loc[u, mm]) for u in orden48]
+        st.caption("Medianas entre distritos: " + "; ".join(
+            f"{_nombre(mm)} {F.num(x)}" for mm, x in r48.groupby("modelo").R2.median().reindex(_orden(r48.modelo)).items()))
+        tabla(t48, "desempeno_r2_distrito_48", "R² en prueba por distrito y modelo (48 meses juntos)", altura=380,
+              nota="Nota. Elaboración propia. Calculado desde las predicciones válidas de las ventanas 1–4, con los 48 "
+                   "meses juntos por semilla; media ± desviación entre semillas.")

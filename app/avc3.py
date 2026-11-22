@@ -43,7 +43,7 @@ CITAS = {
 TABLAS = [
     "datos_cobertura", "datos_validacion_grafos", "datos_solapamiento", "modelado_configuracion",
     "desempeno_global", "desempeno_ventana", "desempeno_semilla", "desempeno_mismo_conjunto",
-    "desempeno_pruebas", "desempeno_r2_distrito",
+    "desempeno_pruebas", "desempeno_r2_distrito", "desempeno_r2_distrito_48",
     "interp_temporal", "interp_spearman", "interp_pares", "interp_fidelidad",
     "equidad_resumen", "equidad_prueba", "equidad_composicion",
     "adversos_pandemia", "adversos_perturbaciones",
