@@ -1,0 +1,13 @@
+,MAE,MAE,RMSE,RMSE,R2,R2
+,mean,std,mean,std,mean,std
+modelo,,,,,,
+GE (ST-GNN vial),29.223,0.436,52.69,0.589,0.796,0.005
+GC₂ (ST-GNN geográfica),29.193,0.43,52.661,0.591,0.796,0.005
+GC₁ (GRU sin grafo),32.153,1.783,57.639,3.036,0.755,0.025
+"GE (ST-GNN vial), promedio de semillas",29.076,,52.556,,0.797,
+"GC₂ (ST-GNN geográfica), promedio de semillas",29.008,,52.501,,0.797,
+"GC₁ (GRU sin grafo), promedio de semillas",31.51,,56.999,,0.761,
+XGBoost,105.8,,160.323,,-0.89,
+Mes anterior,29.208,,52.905,,0.794,
+Promedio móvil 3 meses,36.922,,77.213,,0.562,
+Mismo mes del año anterior,108.559,,169.552,,-1.114,

@@ -264,3 +264,4 @@ hiperparametros:
       entrada_meses: 6
       mae_validacion: 37.9925
 seleccion: multianual
+correccion_cache_grafo: true

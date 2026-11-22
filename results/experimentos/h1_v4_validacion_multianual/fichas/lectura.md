@@ -1,5 +1,9 @@
 # v4 (candidato 3b): selección de hiperparámetros con varios años de validación — lectura
 
+> Reentrenada en la PC de Giuseppi (2026-11-22): GE MAE 32,139; en la PC de Josué, 32,139. Las 60 corridas pararon
+> en la misma época; las predicciones difieren como mucho en 0,005 denuncias. Atención (OE3) y casos adversos
+> calculados en esa PC con la corrección de la caché del grafo.
+
 **Decisión: se adopta como v4**, con la regla fijada antes de correr (confirmación fuera de muestra, sección 2). La
 línea base es `h1_base` (v2) reentrenada en esta PC. MAE en denuncias por distrito y mes. Nota. Elaboración propia.
 
